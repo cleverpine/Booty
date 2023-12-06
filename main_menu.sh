@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./project_setup.sh
+source ./common_setup.sh
+source ./frontend_setup.sh
 
 
 # Function to display the ASCII art logo
@@ -119,29 +120,6 @@ show_main_menu() {
   read -p "Enter the number of your choice (or type 'help' for more options): " choice
 }
 
-# Function to execute git commands
-execute_git_commands() {
-  # Your git commands here
-  echo "Executing git commands..."
-}
-
-# Function to set environment variables
-set_environment_variables() {
-  # Your commands to set environment variables here
-  echo "Setting environment variables..."
-}
-
-# Function to call Java application
-call_java_application() {
-  # Your command to run Java application here
-  echo "Calling Java application..."
-}
-
-# Function to call Node application
-call_node_application() {
-  # Your command to run Node application here
-  echo "Calling Node application..."
-}
 
 # Function to display help menu
 display_help_menu() {
@@ -182,12 +160,12 @@ handle_user_choice() {
       ;;
     2)
       echo "You have selected \"Back-end service\"."
-      handle_project_setup "Back-end"
       # Handle Back-end service setup
       ;;
     3)
       echo "You have selected \"Front-end service\"."
-      handle_project_setup "Front-end"
+      # setup_git "Front-end"
+      setup_frontend
       # Handle Front-end service setup
       ;;
     4)
