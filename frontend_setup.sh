@@ -27,26 +27,32 @@ setup_frontend() {
 
 
 setup_angular() {
-    local project_name=$(setup_git "Angular")
-
+    setup_git "Angular"
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
-    SKELETON_DIR="angular-skeleton"
+    # SKELETON_DIR="angular-skeleton"
 
     log_major_step "Cloning Angular skeleton repository..."
     # Clone the Angular skeleton repository
-    git clone $SKELETON_REPO $SKELETON_DIR
+    git clone $SKELETON_REPO $PROJECT_DIR
 
     log_major_step "Changing work dir to $SKELETON_DIR..."
-    cd $SKELETON_DIR
-    git checkout d21931724619b6dc80c3c3c42dfcb4786049d504
+    echo "Project dir is $PROJECT_DIR"
+    cd $PROJECT_DIR
+    git remote remove origin
+
+    # Check if git_clone_url is provided and add it as a remote
+    if [ -n "$GIT_CLONE_URL" ]; then
+        log_major_step "Adding provided Git URL as a remote..."
+        git remote add origin $GIT_CLONE_URL
+    fi
+
     # Merge skeleton with angular CLI generated project
-    generate_new_project $project_name $SKELETON_DIR
+    generate_new_project $PROJECT_DIR $SKELETON_DIR
 }
 
 
-
 generate_new_project() {
-    if [ -z "$project_name" ] || [ -z "$SKELETON_DIR" ]; then
+    if [ -z "$PROJECT_DIR" ]; then
         log "Missing arguments for generate_new_project"
         return 1
     fi
@@ -59,12 +65,12 @@ generate_new_project() {
     git add -A && git commit -m "Initial commit with updated structure"
     ng_update_all_packages
 
-    log_major_step "Renaming skeleton project to $project_name..."
+    log_major_step "Renaming skeleton project to $PROJECT_DIR..."
     # Rename project in specific files
-    sed -i "" "s/angular-skeleton/$project_name/g" package.json
-    sed -i "" "s/angular-skeleton/$project_name/g" angular.json
-    sed -i "" "s/angular-skeleton/$project_name/g" docker-compose.yml
-    sed -i "" "s/angular-skeleton/$project_name/g" README.md
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package.json
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" angular.json
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" docker-compose.yml
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" README.md
 
     # Regenerate package-lock.json
     log_major_step "Regenerating package-lock.json..."
@@ -74,16 +80,11 @@ generate_new_project() {
 
     # Remove skeleton remote repository link
     git remote remove origin
-    git add . && git commit -m "Project $project_name setup complete"
+    git add . && git commit -m "Project $PROJECT_DIR setup complete"
 
-    # Create a fresh main branch with no history
-    # git checkout --orphan new-main
-    # git add -A
-    # git commit -m "Initial commit with updated structure"
-    # git branch -M new-main
-    # git remote add origin <new-repository-url>
-    # git push -u origin new-main
+    display_library_options
 }
+
 
 ng_update_all_packages() {
     update_list=$(ng update | grep 'ng update @angular' 2>&1)
@@ -106,8 +107,6 @@ ng_update_all_packages() {
         echo "No packages to update."
     fi
 }
-
-
 
 
 display_library_options() {
