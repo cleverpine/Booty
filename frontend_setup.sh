@@ -26,72 +26,88 @@ setup_frontend() {
 }
 
 
-generate_new_project() {
-    local project_dir=$1
-    local project_dir_skeleton=$2
-    local latest_branch=$3
-
-    if [ -z "$project_dir" ] || [ -z "$project_dir_skeleton" ] || [ -z "$latest_branch" ]; then
-        log "Error: Missing arguments for generate_new_project"
-        return 1
-    fi
-
-    log_major_step "Generating latest Angular CLI project..."
-    if ! npx -y -p @angular/cli@latest ng new "$project_dir" --style=scss --skip-git=true --ssr=false --skip-install=true --directory="$project_dir"; then
-        log "Error: Angular CLI project generation failed"
-        return 1
-    fi
-
-    cd "$project_dir" || { log "Error: Failed to change directory to $project_dir"; return 1; }
-
-    if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-        git init
-    fi
-
-    git checkout -b "$latest_branch"
-    git add . && git commit -m "Angular CLI project generated"
-
-    log_major_step "Merging skeleton with latest Angular CLI project..."
-    # git remote add skeleton "../$project_dir_skeleton"
-    # git fetch skeleton
-
-    # if ! git merge -X theirs --squash skeleton/main --allow-unrelated-histories; then
-    #     log "Error: Merge failed"
-    #     return 1
-    # fi
-
-    # if git ls-files -u | grep -q '^'; then
-    #     log "Merge conflicts detected. Please resolve them before proceeding."
-    #     return 1
-    # else
-    #     log "Merge successful. Commiting changes..."
-    #     git commit -m "Merge angular-skeleton/main into latest Angular CLI"
-    # fi
-
-    # # Ensure the directory exists and is not empty before removing
-    # if [ -d "../$project_dir_skeleton" ] && [ "$(ls -A "../$project_dir_skeleton")" ]; then
-    #     rm -rf "../$project_dir_skeleton"
-    # fi
-
-    # log "Setup complete."
-}
-
-
 setup_angular() {
-    local project_dir=$(setup_git "Angular")
-
-    local project_dir_skeleton=${project_dir}-skeleton
+    local project_name=$(setup_git "Angular")
 
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
-    LATEST_BRANCH="latest"
+    SKELETON_DIR="angular-skeleton"
 
     log_major_step "Cloning Angular skeleton repository..."
     # Clone the Angular skeleton repository
-    git clone $SKELETON_REPO $project_dir_skeleton
+    git clone $SKELETON_REPO $SKELETON_DIR
 
+    log_major_step "Changing work dir to $SKELETON_DIR..."
+    cd $SKELETON_DIR
+    git checkout d21931724619b6dc80c3c3c42dfcb4786049d504
     # Merge skeleton with angular CLI generated project
-    generate_new_project $project_dir $project_dir_skeleton $LATEST_BRANCH
+    generate_new_project $project_name $SKELETON_DIR
 }
+
+
+
+generate_new_project() {
+    if [ -z "$project_name" ] || [ -z "$SKELETON_DIR" ]; then
+        log "Missing arguments for generate_new_project"
+        return 1
+    fi
+
+    log_major_step "Clean installing project..."
+    npm ci
+    log_major_step "Updating Skeleton with latest Angular versions..."
+    ng update @angular/core @angular/cli --force
+    git checkout --orphan new-main
+    git add -A && git commit -m "Initial commit with updated structure"
+    ng_update_all_packages
+
+    log_major_step "Renaming skeleton project to $project_name..."
+    # Rename project in specific files
+    sed -i "" "s/angular-skeleton/$project_name/g" package.json
+    sed -i "" "s/angular-skeleton/$project_name/g" angular.json
+    sed -i "" "s/angular-skeleton/$project_name/g" docker-compose.yml
+    sed -i "" "s/angular-skeleton/$project_name/g" README.md
+
+    # Regenerate package-lock.json
+    log_major_step "Regenerating package-lock.json..."
+    rm -rf node_modules
+    rm -f package-lock.json
+    npm install
+
+    # Remove skeleton remote repository link
+    git remote remove origin
+    git add . && git commit -m "Project $project_name setup complete"
+
+    # Create a fresh main branch with no history
+    # git checkout --orphan new-main
+    # git add -A
+    # git commit -m "Initial commit with updated structure"
+    # git branch -M new-main
+    # git remote add origin <new-repository-url>
+    # git push -u origin new-main
+}
+
+ng_update_all_packages() {
+    update_list=$(ng update | grep 'ng update @angular' 2>&1)
+    package_array=()  # Initialize an empty array to store package names
+
+    IFS=$'\n' # Split output into lines
+    for line in $update_list; do
+        if [[ $line == *'->'* ]]; then
+            package_name=$(echo "$line" | awk '{print $1}')
+            package_array+=("$package_name")  # Append the package name to the array
+        fi
+    done
+    unset IFS
+
+    # Construct and execute the update command if there are packages to update
+    if [ ${#package_array[@]} -ne 0 ]; then
+        echo "Updating all packages..."
+        ng update "${package_array[@]}"
+    else
+        echo "No packages to update."
+    fi
+}
+
+
 
 
 display_library_options() {
