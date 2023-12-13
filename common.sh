@@ -1,3 +1,10 @@
+source ./git_commands.sh
+
+export RED='\033[31m'
+export GREEN='\033[32m'
+export PURPLE='\033[35m'
+export NC='\033[0m' # No Color
+
 export PROJECT_DIR=""
 export GIT_CLONE_URL=""
 
@@ -28,9 +35,10 @@ setup_git() {
 
 
 setup_ssh() {
-    read -p "Enter a specific SSH directory or leave blank for default: " ssh_dir
-    if [ -z "$ssh_dir" ]; then
+    read -p "Enter a specific SSH directory (leave blank for default): " SSH_DIR
+    if [ -z "$SSH_DIR" ]; then
         log "Using default SSH directory."
+        SSH_DIR="$HOME/.ssh/id_rsa"
     else
         log "Using SSH directory: $ssh_dir..."
         # Here, you can add commands to configure SSH with the specified directory.
@@ -46,8 +54,8 @@ log() {
 
 log_major_step() {
     log ""
-    log "--------------------------------------------------------------"
-    log "$1"
-    log "--------------------------------------------------------------"
+    log "----------------------------------------------------------------------------------------------------------------------------"
+    log "${PURPLE}$1${NC}"
+    log "----------------------------------------------------------------------------------------------------------------------------"
     log ""
 }

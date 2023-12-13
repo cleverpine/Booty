@@ -1,8 +1,10 @@
 #!/bin/bash
 
-source ./common_setup.sh
+source ./common.sh
 source ./frontend_setup.sh
 
+readonly APP_VERSION=0.0.1
+readonly CURRENT_DIR=$(pwd)
 
 # Function to display the ASCII art logo
 # display_logo() {
@@ -180,7 +182,7 @@ handle_user_choice() {
       exit 0
       ;;
     version)
-      echo "PineBoot version: 0.0.1"
+      echo "PineBoot version: ${APP_VERSION}"
       # Or fetch the version dynamically if needed
       ;;
     *)

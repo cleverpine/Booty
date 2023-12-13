@@ -1,5 +1,5 @@
-source ./common_setup.sh
-
+source ./common.sh
+source ./git_commands.sh
 
 setup_frontend() {
   echo ""
@@ -16,37 +16,44 @@ setup_frontend() {
         2)
         setup_react
         ;;
+        exit)
+        log "Exiting PineBoot."
+        exit 0
+        ;;
         help)
-        echo "Help is on the way!"
+        log "Help is on the way!"
         ;;
         *)
-        echo "Invalid choice. Please try again."
+        log "Invalid choice. Please try again."
         ;;
     esac
 }
 
 
 setup_angular() {
+    # 1.Generate a function that acts as a prerequisite checker if the user has the necessary tools to set up a new project
+    log_major_step "Checking prerequisites..."
+    assert_prerequisites
+
+    # 2.Configure SSH directory and Git clone URL
     setup_git "Angular"
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     # SKELETON_DIR="angular-skeleton"
 
+    # 3.Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
-    # Clone the Angular skeleton repository
-    git clone $SKELETON_REPO $PROJECT_DIR
+    GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
 
-    log_major_step "Changing work dir to $SKELETON_DIR..."
-    echo "Project dir is $PROJECT_DIR"
+
+    # 4.Check if git_clone_url is provided and add it as a remote
     cd $PROJECT_DIR
     git remote remove origin
-
-    # Check if git_clone_url is provided and add it as a remote
     if [ -n "$GIT_CLONE_URL" ]; then
         log_major_step "Adding provided Git URL as a remote..."
         git remote add origin $GIT_CLONE_URL
     fi
 
-    # Merge skeleton with angular CLI generated project
+    # 5.Generate a new project from the skeleton using latet Angular versions
     generate_new_project $PROJECT_DIR $SKELETON_DIR
 }
 
@@ -78,11 +85,12 @@ generate_new_project() {
     rm -f package-lock.json
     npm install
 
-    # Remove skeleton remote repository link
-    git remote remove origin
-    git add . && git commit -m "Project $PROJECT_DIR setup complete"
+    git_add_commit_package_json "Update latest versions of Angular dependencies"
 
-    display_library_options
+    install_cp_libraries
+    
+    log_major_step "Committing final touches..."
+    git add . && git commit -m "Install additional cp libraries"
 }
 
 
@@ -109,7 +117,7 @@ ng_update_all_packages() {
 }
 
 
-display_library_options() {
+install_cp_libraries() {
     # Declare an associative array for package names
     declare -A packages
     packages=(
@@ -121,17 +129,19 @@ display_library_options() {
         [6]="ng-openapi-gen"
     )
 
-    echo "Please select the libraries you want to install (leave blank or enter 'n' to skip):"
+    log_major_step "Choose additional libraries to install"
+
+    log "Please select the libraries you want to install (leave blank to skip):"
     for key in "${!packages[@]}"; do
         echo "$key. ${packages[$key]}"
     done
-    echo ""
+    log ""
     read -p "Enter a comma-separated list of all libraries you wish to include: " choices
 
     # Check if input is empty or 'n'
     if [[ -z "$choices" || "$choices" == "n" ]]; then
-        echo "No additional libraries selected. Exiting."
-        return
+        log "No additional libraries selected. Exiting PineBoot."
+        return 0
     fi
 
     # Convert choices into an array
@@ -146,15 +156,15 @@ display_library_options() {
         if [ -n "$package_name" ]; then
             npm_packages+="$package_name "
         else
-            echo "Invalid choice: $choice. Please try again."
+            log "Invalid choice: $choice. Please try again."
         fi
     done
 
     # Check if any package is selected
     if [ -n "$npm_packages" ]; then
-        echo "Installing selected packages..."
+        log "Installing selected packages..."
         npm install $npm_packages --save
     else
-        echo "No valid libraries selected."
+        log "No valid libraries selected."
     fi
 }
