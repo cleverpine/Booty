@@ -8,6 +8,22 @@ export NC='\033[0m' # No Color
 export PROJECT_DIR=""
 export GIT_CLONE_URL=""
 
+declare -A backend_libraries=(
+    [1]="cp-spring-jpa-specification-resolver"
+    [2]="cp-spring-error-util"
+    [3]="cp-virava-spring-helper"
+    [4]="cp-jpa-specification-resolver"
+    [5]="cp-logging-library"
+)
+
+declare -A frontend_libraries=(
+    [1]="cp-lht-header"
+    [2]="cp-lht-sidebar"
+    [3]="cp-lht-tile"
+    [4]="primeng"
+    [5]="syncfusion"
+    [6]="ng-openapi-gen"
+)
 
 setup_git() {
     local service_type=$1
@@ -47,7 +63,7 @@ setup_ssh() {
 
 
 log() {
-    >&2 echo $1
+    >&2 echo -e $1
 
 }
 

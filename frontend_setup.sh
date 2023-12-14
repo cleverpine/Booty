@@ -1,6 +1,8 @@
 source ./common.sh
 source ./git_commands.sh
 
+libraries_choice = ""
+
 setup_frontend() {
   echo ""
   echo "Please select the type of frontend you want to set up:"
@@ -33,19 +35,23 @@ setup_frontend() {
 setup_angular() {
     # 1.Generate a function that acts as a prerequisite checker if the user has the necessary tools to set up a new project
     log_major_step "Checking prerequisites..."
-    assert_prerequisites
+    assert_angular_prerequisites
+    log_major_step "Prerequisites met! Begin project setup."
 
     # 2.Configure SSH directory and Git clone URL
     setup_git "Angular"
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     # SKELETON_DIR="angular-skeleton"
 
-    # 3.Clone the Angular skeleton repository
+    # 3.Select all cp libraries you want to include
+    choose_cp_libraries
+
+    # 4.Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
 
 
-    # 4.Check if git_clone_url is provided and add it as a remote
+    # 5.Check if git_clone_url is provided and add it as a remote
     cd $PROJECT_DIR
     git remote remove origin
     if [ -n "$GIT_CLONE_URL" ]; then
@@ -53,7 +59,9 @@ setup_angular() {
         git remote add origin $GIT_CLONE_URL
     fi
 
-    # 5.Generate a new project from the skeleton using latet Angular versions
+    
+
+    # 6.Generate a new project from the skeleton using latet Angular versions
     generate_new_project $PROJECT_DIR $SKELETON_DIR
 }
 
@@ -87,7 +95,13 @@ generate_new_project() {
 
     git_add_commit_package_json "Update latest versions of Angular dependencies"
 
-    install_cp_libraries
+    # Check if any package is selected
+    if [ -n "$libraries_choice" ]; then
+        log_major_step "Installing selected packages..."
+        npm install $libraries_choice --save
+    else
+        log "No valid libraries selected."
+    fi
     
     log_major_step "Committing final touches..."
     git add . && git commit -m "Install additional cp libraries"
@@ -116,24 +130,12 @@ ng_update_all_packages() {
     fi
 }
 
-
-install_cp_libraries() {
-    # Declare an associative array for package names
-    declare -A packages
-    packages=(
-        [1]="cp-lht-header"
-        [2]="cp-lht-sidebar"
-        [3]="cp-lht-tile"
-        [4]="primeng"
-        [5]="syncfusion"
-        [6]="ng-openapi-gen"
-    )
-
+choose_cp_libraries() {
     log_major_step "Choose additional libraries to install"
 
     log "Please select the libraries you want to install (leave blank to skip):"
-    for key in "${!packages[@]}"; do
-        echo "$key. ${packages[$key]}"
+    for ((i=0; i<${#frontend_libraries[@]}; i++)); do
+        echo "$((i+1)). ${frontend_libraries[i+1]}"
     done
     log ""
     read -p "Enter a comma-separated list of all libraries you wish to include: " choices
@@ -152,19 +154,54 @@ install_cp_libraries() {
 
     for choice in "${choice_array[@]}"
     do
-        package_name=${packages[$choice]}
-        if [ -n "$package_name" ]; then
-            npm_packages+="$package_name "
+        index=$((choice - 1))
+        if [ "$index" -ge 0 ] && [ "$index" -lt "${#frontend_libraries[@]}" ]; then
+            npm_packages+="${frontend_libraries[index]} "
         else
             log "Invalid choice: $choice. Please try again."
         fi
     done
 
-    # Check if any package is selected
-    if [ -n "$npm_packages" ]; then
-        log "Installing selected packages..."
-        npm install $npm_packages --save
-    else
-        log "No valid libraries selected."
+    libraries_choice=$npm_packages
+    log $libraries_choice
+}
+
+
+assert_angular_prerequisites() {
+    local node_version npm_version git_version
+
+    # 1. Check if Node.js is installed
+    if ! command -v node &> /dev/null
+    then
+        log "Node.js could not be found. Please install Node.js and try again."
+        exit 1
     fi
+
+    # Get Node.js version
+    node_version=$(node -v)
+
+    # 2. Check if npm is installed
+    if ! command -v npm &> /dev/null
+    then
+        log "npm could not be found. Please install npm and try again."
+        exit 1
+    fi
+
+    # Get npm version
+    npm_version=$(npm -v)
+
+    # 3. Check if Git is installed
+    if ! command -v git &> /dev/null
+    then
+        log "Git could not be found. Please install Git and try again."
+        exit 1
+    fi
+
+    # Get Git version
+    git_version=$(git --version | awk '{print $3}')
+
+    # Display versions
+    log "Node.js version: $node_version"
+    log "npm version: $npm_version"
+    log "Git version: $git_version"
 }

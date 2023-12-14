@@ -2,79 +2,14 @@
 
 source ./common.sh
 source ./frontend_setup.sh
+source ./backend_setup.sh
 
 readonly APP_VERSION=0.0.1
 readonly CURRENT_DIR=$(pwd)
 
 # Function to display the ASCII art logo
-# display_logo() {
-#     echo "                                          ##                                "            
-#     echo "                                        ######                              "            
-#     echo "                                      ##########                            "            
-#     echo "                                    ##############                          "            
-#     echo "                            #      ################      #                  "            
-#     echo "                            ####      ##########      ####                  "            
-#     echo "                             ######      ####      #######                  "            
-#     echo "                             #########          #########                   "            
-#     echo "                             ##########        ##########                   "            
-#     echo "                             #######      ###     #######                   "            
-#     echo "                             ####      ########      ####                   "            
-#     echo "                       ###          ##############          ###             "            
-#     echo "                       ######      ################      ######             "            
-#     echo "                       #########      ##########      #########             "            
-#     echo "                        ###########      ####      ###########              "            
-#     echo "                        ###############         ##############              "            
-#     echo "                        ###############        ###############              "            
-#     echo "                  #       ##########      ##       #########       #        "            
-#     echo "                  ####       ###      ##########      ###       ####        "            
-#     echo "                  #######          ################          #######        "            
-#     echo "                   #######         ################         #######         "            
-#     echo "                   ####      ###      ##########      ###      ####         "            
-#     echo "                   #      #########      ####      #########      #         "            
-#     echo "                       ###############          ###############             "            
-#     echo "                       ################        ################             "            
-#     echo "                          ##########      ###     ##########                "            
-#     echo "                             ####      ########      ####                   "            
-#     echo "                                    ##############                          "            
-#     echo "                                   ################                         "            
-#     echo "                                      ##########                            "            
-#     echo "                                         ####                               "
-#     echo "                                                                            "
-
-#     echo "                                                                            "
-#     echo "                                                                            "
-#     echo "                      _____ _            ____               _               "
-#     echo "                      |  __ (_)          |  _ \            | |              "
-#     echo "                      | |__) | _ __   ___| |_) | ___   ___ | |_             "
-#     echo "                      |  ___/ | '_ \ / _ \  _ < / _ \ / _ \| __|            "
-#     echo "                      | |   | | | | |  __/ |_) | (_) | (_) | |_             "
-#     echo "                      |_|   |_|_| |_|\___|____/ \___/ \___/ \__|            "
-#     echo "                                                                            "
-#     echo "                                                                            "
-# }
-
-# display_logo() {
-#     echo "                                                      "            
-#     echo "                                                      "            
-#     echo "                    ##                                "            
-#     echo "                ##########                            "            
-#     echo "              ##############                          "            
-#     echo "      #      ################      #                  "            
-#     echo "      ####      ##########      ####                  "            
-#     echo "       ######      ####      #######                  "            
-#     echo "       #########          #########                   "            
-#     echo "       ##########        ##########                   "            
-#     echo "       #######      ###     #######              _____ _            ____               _     "            
-#     echo "       ####      ########      ####              |  __ (_)          |  _ \            | |    "            
-#     echo " ###          ##############          ###        | |__) | _ __   ___| |_) | ___   ___ | |_   "            
-#     echo " ######      ################      ######        |  ___/ | '_ \ / _ \  _ < / _ \ / _ \| __|  "            
-#     echo " #########      ##########      #########        | |   | | | | |  __/ |_) | (_) | (_) | |_   "            
-#     echo "  ###########      ####      ###########         |_|   |_|_| |_|\___|____/ \___/ \___/ \__|  "
-#     echo "                                                      "            
-#     echo "                                                      " 
-# }
-
 display_logo(){
+        echo -e "${GREEN}"
         echo "                                                            "            
         echo "                                                            "            
         echo "                                                            "            
@@ -93,6 +28,7 @@ display_logo(){
         echo "       ######      ################      ######             "
         echo "       #########      ##########      #########             "
         echo "        ###########      ####      ###########              "
+        echo -e "${NC}"  
         echo "                                                             "
         echo "   _____  _               ____                 _             "
         echo "  |  __ \(_)             |  _ \               | |            "
@@ -101,27 +37,8 @@ display_logo(){
         echo "  | |    | || | | ||  __/| |_) || (_) || (_) || |_           "
         echo "  |_|    |_||_| |_| \___||____/  \___/  \___/  \__|          "
         echo "                                                             "            
-        echo "                                                             "  
-#                                                    
-# 
+        echo "                                                             "
 }
-
-
-
-
-# Function to display the main menu
-show_main_menu() {
-  echo "Welcome to PineBoot!"
-  echo ""
-  echo "Please select the type of project you want to set up:"
-  echo "1. Entire Project"
-  echo "2. Back-end service"
-  echo "3. Front-end service"
-  echo "4. QA Automation service"
-  echo ""
-  read -p "Enter the number of your choice (or type 'help' for more options): " choice
-}
-
 
 # Function to display help menu
 display_help_menu() {
@@ -162,6 +79,7 @@ handle_user_choice() {
       ;;
     2)
       echo "You have selected \"Back-end service\"."
+      setup_backend
       # Handle Back-end service setup
       ;;
     3)
