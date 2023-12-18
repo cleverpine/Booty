@@ -47,7 +47,7 @@ setup_spring_boot() {
     SSH_DIR=$(configure_ssh)
 
     # 4. Configure Git remote repository (optional)
-    GIT_CLONE_URL=$(prompt_git_remote)
+    GIT_REMOTE_URL=$(prompt_git_remote)
 
     # 5. Select all cp libraries you want to include
     LIBRARIES_CHOICE=$(prompt_cp_libraries "BE")

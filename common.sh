@@ -37,11 +37,11 @@ prompt_project_name() {
     fi
 }
 
-prompt_clone_url() {
+prompt_git_remote() {
     # Prompt for remote repository URL to clone. If left blank, no remote will be set
-    read -p "Paste a clone URL (leave blank if none) " GIT_CLONE_URL
+    read -p "Paste a clone URL (leave blank if none) " GIT_REMOTE_URL
 
-    echo "$GIT_CLONE_URL"
+    echo "$GIT_REMOTE_URL"
 }
 
 

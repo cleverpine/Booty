@@ -41,7 +41,7 @@ setup_angular() {
 
     local PROJECT_DIR
     local SSH_DIR
-    local GIT_CLONE_URL
+    local GIT_REMOTE_URL
     local LIBRARIES_CHOICE
 
     local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
@@ -52,7 +52,7 @@ setup_angular() {
     # 3. Configure SSH directory 
     SSH_DIR=$(configure_ssh)
 
-    GIT_CLONE_URL=$(prompt_clone_url)
+    GIT_REMOTE_URL=$(prompt_git_remote)
 
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     # SKELETON_DIR="angular-skeleton"
@@ -76,9 +76,9 @@ setup_angular() {
     fi
 
     git remote remove origin
-    if [ -n "$GIT_CLONE_URL" ]; then
+    if [ -n "$GIT_REMOTE_URL" ]; then
         log_major_step "Adding provided Git URL as a remote..."
-        git remote add origin $GIT_CLONE_URL
+        git remote add origin $GIT_REMOTE_URL
     fi
 
     # install_additional_libraries $LIBRARIES_CHOICE
