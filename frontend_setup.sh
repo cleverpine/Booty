@@ -8,8 +8,9 @@ setup_frontend() {
   echo "1. Angular"
   echo "2. React"
   echo ""
-  read -p "Enter the number of your choice (or type 'help' for more options): " choice
-  
+  local choice
+  user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
+
     case "$choice" in
         1)
         setup_angular
@@ -39,36 +40,39 @@ setup_angular() {
     assert_angular_prerequisites
     log_major_step "Prerequisites met! Begin project setup."
 
+    local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     local PROJECT_DIR
     local SSH_DIR
     local GIT_REMOTE_URL
     local LIBRARIES_CHOICE
-
-    local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     
     # 2. Prompt for project name
-    PROJECT_DIR=$(prompt_project_name)
+    prompt_project_name PROJECT_DIR
 
     # 3. Configure SSH directory 
-    SSH_DIR=$(configure_ssh)
+    configure_ssh SSH_DIR
 
-    GIT_REMOTE_URL=$(prompt_git_remote)
-
-    SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
-    # SKELETON_DIR="angular-skeleton"
+    # 4. Configure Git remote repository (optional)
+    prompt_git_remote GIT_REMOTE_URL
+    
 
     # 5. Select all cp libraries you want to include
-    LIBRARIES_CHOICE=$(prompt_cp_libraries "FE")
+    prompt_cp_libraries "FE" LIBRARIES_CHOICE
+
+    log_major_step "Using the following configuration:"
+    log "Project name: $PROJECT_DIR"
+    log "SSH directory: $SSH_DIR"
+    log "Git remote URL: $GIT_REMOTE_URL"
+    log "Libraries to install: $LIBRARIES_CHOICE"
+
 
     # 6. Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
-    echo "Skeleton repo: $SKELETON_REPO"
-    echo "Project dir: $PROJECT_DIR"
 
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
     cd $PROJECT_DIR
 
-    # 7. Check if git_clone_url is provided and add it as a remote
+    # 7. Check if git_remote_url is provided and add it as a remote
     # if current directory is not the project directory, exit with error
     if [ "$(basename $(pwd))" != "$PROJECT_DIR" ]; then
         log_error "Current directory is not the project directory. Exiting..."
@@ -81,11 +85,8 @@ setup_angular() {
         git remote add origin $GIT_REMOTE_URL
     fi
 
-    # install_additional_libraries $LIBRARIES_CHOICE
-
     # 8. Generate a new project from the skeleton using latet Angular versions
     generate_new_project $PROJECT_DIR $LIBRARIES_CHOICE
-
 }
 
 
@@ -159,6 +160,7 @@ ng_update_all_packages() {
     fi
 }
 
+
 install_additional_libraries() {
     local LIBRARIES_CHOICE=$1
     log "LIBRARIES_CHOICE: $LIBRARIES_CHOICE"
@@ -167,24 +169,28 @@ install_additional_libraries() {
     IFS=',' read -r -a LIBRARIES_CHOICE_ARRAY <<< "$LIBRARIES_CHOICE"
     log "LIBRARIES_CHOICE_ARRAY: ${LIBRARIES_CHOICE_ARRAY[*]}"
 
-    # Initialize an empty string to accumulate package names
-    local npm_packages=""
+    local npm_packages=()
     for choice in "${LIBRARIES_CHOICE_ARRAY[@]}"
     do
-        local index=$((choice - 1))
-        if [ "$index" -ge 0 ] && [ "$index" -lt "${#frontend_libraries[@]}" ]; then
-            npm_packages+="${frontend_libraries[$index]} "
-        else
-            log "Invalid choice: $choice. Please try again."
-        fi
+        for lib in "${frontend_libraries[@]}"; do
+            IFS=':' read -r key value <<< "$lib"
+            if [ "$key" == "$choice" ]; then
+                npm_packages+=("$value")
+                break
+            fi
+        done
     done
 
-    log "npm_packages: $npm_packages"
+    log "npm_packages: ${npm_packages[*]}"
     # Install any libraries selected by the user
-    if [ -n "$npm_packages" ]; then
+    if [ "${#npm_packages[@]}" -gt 0 ]; then
         log_major_step "Installing selected packages..."
-        npm install "$npm_packages" --save
+        npm install "${npm_packages[@]}" --save
     else
         log "No additional libraries selected for install."
     fi
 }
+
+
+
+

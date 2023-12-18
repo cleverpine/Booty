@@ -41,21 +41,6 @@ display_logo(){
 # 
 }
 
-
-# Function to display the main menu
-show_main_menu() {
-  echo "Welcome to PineBoot!"
-  echo ""
-  echo "Please select the type of project you want to set up:"
-  echo "1. Entire Project"
-  echo "2. Back-end service"
-  echo "3. Front-end service"
-  echo "4. QA Automation service"
-  echo ""
-  read -p "Enter the number of your choice (or type 'help' for more options): " choice
-}
-
-
 # Function to display help menu
 display_help_menu() {
     echo "Help Options:"
@@ -68,7 +53,9 @@ display_help_menu() {
     echo "'exit' - Close PineBoot."
     echo "'version' - Display the current version of PineBoot."
     echo ""
-    read -p "Enter the number of your choice or a command: " choice
+   
+    local choice
+    user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
     handle_user_choice
 }
 
@@ -82,7 +69,10 @@ show_main_menu() {
   echo "3. Front-end service"
   echo "4. QA Automation service"
   echo ""
-  read -p "Enter the number of your choice (or type 'help' for more options): " choice
+
+  local choice
+  user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
+
   handle_user_choice
 }
 
@@ -129,7 +119,7 @@ handle_user_choice() {
 # Other functions here (e.g., execute_git_commands, set_environment_variables, etc.)
 
 # Clear the screen
-clear
+# clear
 
 # Display the logo
 display_logo
