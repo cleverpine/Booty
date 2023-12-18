@@ -63,9 +63,15 @@ setup_angular() {
     # 6. Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
+    cd $PROJECT_DIR
 
     # 7. Check if git_clone_url is provided and add it as a remote
-    cd $PROJECT_DIR
+    # if current directory is not the project directory, exit with error
+    if [ "$(basename $(pwd))" != "$PROJECT_DIR" ]; then
+        log_error "Current directory is not the project directory. Exiting..."
+        exit 1
+    fi
+
     git remote remove origin
     if [ -n "$GIT_CLONE_URL" ]; then
         log_major_step "Adding provided Git URL as a remote..."
@@ -144,7 +150,7 @@ ng_update_all_packages() {
     # Construct and execute the update command if there are packages to update
     if [ ${#package_array[@]} -ne 0 ]; then
         echo "Updating all packages..."
-        ng update "${package_array[@]}"
+        ng update "${package_array[@]}"`
     else
         echo "No packages to update."
     fi
