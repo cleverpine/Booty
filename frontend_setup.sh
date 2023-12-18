@@ -1,5 +1,6 @@
 source ./common.sh
 source ./git_commands.sh
+source ./assertions.sh
 
 setup_frontend() {
   echo ""
@@ -31,21 +32,39 @@ setup_frontend() {
 
 
 setup_angular() {
-    # 1.Generate a function that acts as a prerequisite checker if the user has the necessary tools to set up a new project
+    local START_DIR=$(pwd)
+
+    # 1. Check prerequisites for setting up an Angular Project
     log_major_step "Checking prerequisites..."
-    assert_prerequisites
+    assert_angular_prerequisites
+    log_major_step "Prerequisites met! Begin project setup."
+
+    local PROJECT_DIR
+    local SSH_DIR
+    local GIT_CLONE_URL
+    local LIBRARIES_CHOICE
+
+    local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
+    
+    # 2. Prompt for project name
+    PROJECT_DIR=$(prompt_project_name)
+
+    # 3. Configure SSH directory 
+    SSH_DIR=$(configure_ssh)
 
     # 2.Configure SSH directory and Git clone URL
     setup_git "Angular"
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     # SKELETON_DIR="angular-skeleton"
 
-    # 3.Clone the Angular skeleton repository
+    # 5. Select all cp libraries you want to include
+    LIBRARIES_CHOICE=$(prompt_cp_libraries "FE")
+
+    # 6. Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
 
-
-    # 4.Check if git_clone_url is provided and add it as a remote
+    # 7. Check if git_clone_url is provided and add it as a remote
     cd $PROJECT_DIR
     git remote remove origin
     if [ -n "$GIT_CLONE_URL" ]; then
@@ -53,44 +72,59 @@ setup_angular() {
         git remote add origin $GIT_CLONE_URL
     fi
 
-    # 5.Generate a new project from the skeleton using latet Angular versions
-    generate_new_project $PROJECT_DIR $SKELETON_DIR
+    # install_additional_libraries $LIBRARIES_CHOICE
+
+    # 8. Generate a new project from the skeleton using latet Angular versions
+    generate_new_project $PROJECT_DIR $LIBRARIES_CHOICE
+
 }
 
 
 generate_new_project() {
+    local PROJECT_DIR=$1
+    local CP_LIBRARIES_TO_INSTALL=$2
+
     if [ -z "$PROJECT_DIR" ]; then
         log "Missing arguments for generate_new_project"
         return 1
     fi
 
+    # 1. Perform a clean install of the skeleton project
     log_major_step "Clean installing project..."
     npm ci
+
+    # 2. Update Angular dependencies to latest versions
     log_major_step "Updating Skeleton with latest Angular versions..."
     ng update @angular/core @angular/cli --force
     git checkout --orphan new-main
     git add -A && git commit -m "Initial commit with updated structure"
     ng_update_all_packages
 
+
+    # 3. Rename skeleton project to the project name provided
     log_major_step "Renaming skeleton project to $PROJECT_DIR..."
-    # Rename project in specific files
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package.json
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" angular.json
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" docker-compose.yml
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" README.md
 
-    # Regenerate package-lock.json
+    # 4. Regenerate package-lock.json
     log_major_step "Regenerating package-lock.json..."
     rm -rf node_modules
     rm -f package-lock.json
     npm install
-
     git_add_commit_package_json "Update latest versions of Angular dependencies"
-
-    install_cp_libraries
     
+
+    # 5. Install any libraries selected by the user
+    log_major_step "Installing additional cp libraries..."
+    install_additional_libraries "$CP_LIBRARIES_TO_INSTALL"
+    
+    # 6. Commit final changes
     log_major_step "Committing final touches..."
     git add . && git commit -m "Install additional cp libraries"
+
+    return 0
 }
 
 
@@ -116,55 +150,32 @@ ng_update_all_packages() {
     fi
 }
 
-
-install_cp_libraries() {
-    # Declare an associative array for package names
-    declare -A packages
-    packages=(
-        [1]="cp-lht-header"
-        [2]="cp-lht-sidebar"
-        [3]="cp-lht-tile"
-        [4]="primeng"
-        [5]="syncfusion"
-        [6]="ng-openapi-gen"
-    )
-
-    log_major_step "Choose additional libraries to install"
-
-    log "Please select the libraries you want to install (leave blank to skip):"
-    for key in "${!packages[@]}"; do
-        echo "$key. ${packages[$key]}"
-    done
-    log ""
-    read -p "Enter a comma-separated list of all libraries you wish to include: " choices
-
-    # Check if input is empty or 'n'
-    if [[ -z "$choices" || "$choices" == "n" ]]; then
-        log "No additional libraries selected. Exiting PineBoot."
-        return 0
-    fi
+install_additional_libraries() {
+    local LIBRARIES_CHOICE=$1
+    log "LIBRARIES_CHOICE: $LIBRARIES_CHOICE"
 
     # Convert choices into an array
-    IFS=',' read -r -a choice_array <<< "$choices"
+    IFS=',' read -r -a LIBRARIES_CHOICE_ARRAY <<< "$LIBRARIES_CHOICE"
+    log "LIBRARIES_CHOICE_ARRAY: ${LIBRARIES_CHOICE_ARRAY[*]}"
 
     # Initialize an empty string to accumulate package names
-    npm_packages=""
-
-    for choice in "${choice_array[@]}"
+    local npm_packages=""
+    for choice in "${LIBRARIES_CHOICE_ARRAY[@]}"
     do
-        package_name=${packages[$choice]}
-        if [ -n "$package_name" ]; then
-            npm_packages+="$package_name "
+        local index=$((choice - 1))
+        if [ "$index" -ge 0 ] && [ "$index" -lt "${#frontend_libraries[@]}" ]; then
+            npm_packages+="${frontend_libraries[$index]} "
         else
             log "Invalid choice: $choice. Please try again."
         fi
     done
 
-    # Check if any package is selected
+    log "npm_packages: $npm_packages"
+    # Install any libraries selected by the user
     if [ -n "$npm_packages" ]; then
-        log "Installing selected packages..."
+        log_major_step "Installing selected packages..."
         npm install $npm_packages --save
     else
-        log "No valid libraries selected."
+        log "No additional libraries selected for install."
     fi
 }

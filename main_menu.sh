@@ -7,6 +7,7 @@ readonly APP_VERSION=0.0.1
 readonly CURRENT_DIR=$(pwd)
 
 display_logo(){
+        echo -e "${GREEN}"
         echo "                                                            "            
         echo "                                                            "            
         echo "                                                            "            
@@ -25,6 +26,7 @@ display_logo(){
         echo "       ######      ################      ######             "
         echo "       #########      ##########      #########             "
         echo "        ###########      ####      ###########              "
+        echo -e "${NC}"
         echo "                                                             "
         echo "   _____  _               ____                 _             "
         echo "  |  __ \(_)             |  _ \               | |            "
@@ -37,8 +39,6 @@ display_logo(){
 #                                                    
 # 
 }
-
-
 
 
 # Function to display the main menu
