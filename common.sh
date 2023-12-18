@@ -31,21 +31,23 @@ prompt_project_name() {
     else
         echo "$PROJECT_DIR"
     fi
+}
 
-    # Prompt for remote repository URL to clone
+prompt_clone_url() {
+    # Prompt for remote repository URL to clone. If left blank, no remote will be set
     read -p "Paste a clone URL (leave blank if none) " GIT_CLONE_URL
 
-    echo "$PROJECT_DIR"
+    echo "$GIT_CLONE_URL"
 }
 
 
-setup_ssh() {
+configure_ssh() {
     read -p "Enter a specific SSH directory (leave blank for default): " SSH_DIR
     if [ -z "$SSH_DIR" ]; then
         log "Using default SSH directory."
         SSH_DIR="$HOME/.ssh/id_rsa"
     else
-        log "Using SSH directory: $ssh_dir..."
+        log "Using SSH directory: $SSH_DIR..."
         # Here, you can add commands to configure SSH with the specified directory.
     fi
 

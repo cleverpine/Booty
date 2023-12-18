@@ -52,8 +52,8 @@ setup_angular() {
     # 3. Configure SSH directory 
     SSH_DIR=$(configure_ssh)
 
-    # 2.Configure SSH directory and Git clone URL
-    setup_git "Angular"
+    GIT_CLONE_URL=$(prompt_clone_url)
+    
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     # SKELETON_DIR="angular-skeleton"
 
@@ -62,6 +62,9 @@ setup_angular() {
 
     # 6. Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
+    echo "Skeleton repo: $SKELETON_REPO"
+    echo "Project dir: $PROJECT_DIR"
+
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
     cd $PROJECT_DIR
 
