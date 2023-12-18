@@ -18,6 +18,7 @@ assert_spring_boot_prerequisites(){
     assert_git_is_present
 
     #log versions of each of the above
+    log ""
     log "Java version: $(java --version)"
     log "Git version: $(git --version)"
 

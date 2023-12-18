@@ -28,6 +28,10 @@ prompt_project_name() {
     if [ -z "$PROJECT_DIR" ]; then
         log_error "You must select a project name."
         prompt_project_name
+    #elif directory already exists remprompt user
+    elif [ -d "$PROJECT_DIR" ]; then
+        log_error "Directory $PROJECT_DIR already exists. Please choose a different name."
+        prompt_project_name
     else
         echo "$PROJECT_DIR"
     fi

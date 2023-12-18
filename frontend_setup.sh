@@ -53,7 +53,7 @@ setup_angular() {
     SSH_DIR=$(configure_ssh)
 
     GIT_CLONE_URL=$(prompt_clone_url)
-    
+
     SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
     # SKELETON_DIR="angular-skeleton"
 
@@ -142,9 +142,9 @@ ng_update_all_packages() {
     package_array=()  # Initialize an empty array to store package names
 
     IFS=$'\n' # Split output into lines
-    for line in $update_list; do
+    for line in "$update_list"; do
         if [[ $line == *'->'* ]]; then
-            package_name=$(echo "$line" | awk '{print $1}')
+            package_name=$(echo "$line" | cut -d ' ' -f 1)
             package_array+=("$package_name")  # Append the package name to the array
         fi
     done
@@ -153,7 +153,7 @@ ng_update_all_packages() {
     # Construct and execute the update command if there are packages to update
     if [ ${#package_array[@]} -ne 0 ]; then
         echo "Updating all packages..."
-        ng update "${package_array[@]}"`
+        ng update "${package_array[@]}"
     else
         echo "No packages to update."
     fi
@@ -183,7 +183,7 @@ install_additional_libraries() {
     # Install any libraries selected by the user
     if [ -n "$npm_packages" ]; then
         log_major_step "Installing selected packages..."
-        npm install $npm_packages --save
+        npm install "$npm_packages" --save
     else
         log "No additional libraries selected for install."
     fi

@@ -2,6 +2,7 @@
 
 source ./common.sh
 source ./frontend_setup.sh
+source ./backend_setup.sh
 
 readonly APP_VERSION=0.0.1
 readonly CURRENT_DIR=$(pwd)
@@ -94,6 +95,7 @@ handle_user_choice() {
       ;;
     2)
       echo "You have selected \"Back-end service\"."
+      setup_backend
       # Handle Back-end service setup
       ;;
     3)
