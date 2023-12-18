@@ -41,18 +41,23 @@ setup_spring_boot() {
     log_major_step "Prerequisites met! Begin project setup."
 
     # 2. Prompt for project name
-    PROJECT_DIR=$(prompt_project_name)
+    prompt_project_name PROJECT_DIR
 
     # 3. Configure SSH directory
-    SSH_DIR=$(configure_ssh)
+    configure_ssh SSH_DIR
 
     # 4. Configure Git remote repository (optional)
-    GIT_REMOTE_URL=$(prompt_git_remote)
+    prompt_git_remote GIT_REMOTE_URL
 
     # 5. Select all cp libraries you want to include
-    LIBRARIES_CHOICE=$(prompt_cp_libraries "BE")
+    prompt_cp_libraries "BE" LIBRARIES_CHOICE
     LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "BE")
-    log "Selected libraries to add: $LIBRARIES_NAMES"
+    
+    log_major_step "Using configuration:"
+    log "Project name: $PROJECT_DIR"
+    log "SSH directory: $SSH_DIR"
+    log "Git remote URL: $GIT_REMOTE_URL"
+    log "Libraries: $LIBRARIES_NAMES"
 
     # # 6. Curl java jar
     # curl <> -o cp-spring-initializr-0.0.1-SNAPSHOT.jar # TODO: Add link to jar and name

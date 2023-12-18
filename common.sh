@@ -190,20 +190,26 @@ library_numbers_to_names() {
     local service_type=$2
     local library_names=""
     local IFS=','
-    local library_source=()
+    local libraries=()
 
     if [ "$service_type" == "FE" ]; then
-        for number in $library_numbers; do
-            library_names+="${frontend_libraries[$number]}, "
-        done
+        libraries=("${frontend_libraries[@]}")
     elif [ "$service_type" == "BE" ]; then
-        for number in $library_numbers; do
-            library_names+="${backend_libraries[$number]}, "
-        done
+        libraries=("${backend_libraries[@]}")
     else 
         log_error "Invalid service type: $service_type"
         exit 1
     fi
+
+    for number in $library_numbers; do
+        for lib in "${libraries[@]}"; do
+            IFS=':' read -r key value <<< "$lib"
+            if [ "$key" == "$number" ]; then
+                library_names+="$value, "
+                break
+            fi
+        done
+    done
 
     # Remove the trailing comma and echo the result
     echo "${library_names%, }"
