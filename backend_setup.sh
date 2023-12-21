@@ -65,12 +65,15 @@ setup_spring_boot() {
 
     log_major_step "Generating Spring Boot project..."
 
-    # 7. Download cp-spring-initializr jar file. 
+    # 7. Download cp-spring-initializr jar file
+    log "Downloading 'CP-Spring-Initializr'..."
+    jar_url="https://github.com/cleverpine/cp-spring-initializr/releases/download/v0.0.1/cp-spring-initializr-0.0.1.jar"
+    jar_name="cp-spring-initializr.jar"
+
     # '-f' argument returns a non-zero exit code on HTTP error response
     # '-L' argument sets the link to download from
     # '-o' argument renames the downloaded file
-    log "Downloading 'CP-Spring-Initializr'..."
-    curl -f -L "https://github.com/cleverpine/cp-spring-initializr/releases/download/v0.0.1/cp-spring-initializr-0.0.1.jar" -o "cp-spring-initializr.jar"
+    curl -f -L "$jar_url" -o "$jar_name"
     curl_status=$?
 
     # 8. Initialize project generation if the jar file was downloaded successfully
