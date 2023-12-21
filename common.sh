@@ -160,6 +160,25 @@ prompt_cp_libraries() {
 # }
 
 
+prompt_boolean() {
+    local prompt_message=$1
+    local _varname=$2
+    local response
+
+    user_prompt "$prompt_message (y/n)" response
+    case $response in
+        [Yy] ) eval "$_varname=true";;
+        [Nn] ) eval "$_varname=false";;
+        * ) 
+            # Reprompt user if input is different than 'y' or 'n'
+            log_error "Please answer 'y' or 'n'."
+            prompt_boolean "$prompt_message" "$_varname"
+            ;;
+    esac
+}
+
+
+
 comma_separated_choice_to_array() {
     local IFS=',' 
     read -r -a array <<< "$1"

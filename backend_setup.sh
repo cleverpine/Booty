@@ -4,7 +4,7 @@ source ./assertions.sh
 
 setup_backend() {
   echo ""
-  echo "Please select the type of frontend you want to set up:"
+  echo "Please select the type of backend you want to set up:"
   echo "1. Spring Boot"
   echo "2. Quarkus"
   echo ""
@@ -52,16 +52,46 @@ setup_spring_boot() {
     # 5. Select all cp libraries you want to include
     prompt_cp_libraries "BE" LIBRARIES_CHOICE
     LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "BE")
+
+    # 6. Prompt for including Open API generator plugin
+    prompt_boolean "Would you like to include Open API generator?" INCLUDE_API
     
     log_major_step "Using configuration:"
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
     log "Libraries: $LIBRARIES_NAMES"
+    log "Include api: $INCLUDE_API"
 
-    # # 6. Curl java jar
-    # curl <> -o cp-spring-initializr-0.0.1-SNAPSHOT.jar # TODO: Add link to jar and name
+    log_major_step "Generating Spring Boot project..."
 
-    # # 7. Create project directory
-    # java -jar cp-spring-initializr-0.0.1-SNAPSHOT.jar --name=$PROJECT_DIR --includeApi=true --dependencies=$LIBRARIES_NAMES
+    # 7. Download cp-spring-initializr jar file. 
+    # '-f' argument returns a non-zero exit code on HTTP error response
+    # '-L' argument sets the link to download from
+    # '-o' argument renames the downloaded file
+    log "Downloading 'CP-Spring-Initializr'..."
+    curl -f -L "https://github.com/cleverpine/cp-spring-initializr/releases/download/v0.0.1/cp-spring-initializr-0.0.1.jar" -o "cp-spring-initializr.jar"
+    curl_status=$?
+
+    # 8. Initialize project generation if the jar file was downloaded successfully
+    if [ $curl_status -eq 0 ]; then
+        log "Initializing project generation..."
+        # Execute the jar file
+        java -jar cp-spring-initializr.jar --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES
+        java_status=$?
+    else
+        log_error "'CP-Spring-Initializr' could not be downloaded!"
+        # Exit if downloading the jar file failed
+        exit 1
+    fi
+
+    # 9. Delete the jar file if it executed successfully
+    if [ $java_status -eq 0 ]; then
+        log "Successfully generated project '$PROJECT_DIR'."
+    else
+        log_error "'CP-Spring-Initializr' could not be executed!"
+    fi
+
+    # 10. Delete the downloaded jar file
+    rm -f cp-spring-initializr.jar
 }
