@@ -18,12 +18,12 @@ backend_libraries=(
 
 # Frontend libraries
 frontend_libraries=(
-    "1:cp-lht-header"
-    "2:cp-lht-sidebar"
-    "3:cp-lht-tile"
-    "4:primeng"
-    "5:syncfusion"
-    "6:ng-openapi-gen"
+    "1:cp-lht-header:0.0.6"
+    "2:cp-lht-sidebar:0.0.8"
+    "3:cp-lht-tile:0.0.6"
+    "4:primeng:17.1.0"
+    "5:syncfusion:latest" #???? 
+    "6:ng-openapi-gen:0.51.0"
 )
 
 
@@ -77,6 +77,7 @@ prompt_cp_libraries() {
     local libraries=()
     local library_keys=()
     local library_values=()
+    local library_names=() # New array for names without versions
 
     if [ "$1" == "FE" ]; then
         libraries=("${frontend_libraries[@]}")
@@ -84,17 +85,18 @@ prompt_cp_libraries() {
         libraries=("${backend_libraries[@]}")
     fi
 
-    # Extract keys and values
+    # Extract keys, values, and names
     for i in "${libraries[@]}"; do
-        IFS=':' read -r key value <<< "$i"
+        IFS=':' read -r key name version <<< "$i"
         library_keys+=("$key")
-        library_values+=("$value")
+        library_values+=("$name@$version") # Combine name and version with @
+        library_names+=("$name") # Add only the name
     done
 
     log_major_step "Choose additional libraries to install"
     log "Available libraries: "
     for (( i=0; i<${#library_keys[@]}; i++ )); do
-        log "   ${library_keys[$i]}. ${library_values[$i]}"
+        log "   ${library_keys[$i]}. ${library_names[$i]}" # Display name without version
     done
     log ""
 
@@ -103,61 +105,11 @@ prompt_cp_libraries() {
     while [ $valid_input -eq 0 ]; do
         user_prompt "Enter a comma-separated list of all libraries you wish to include (leave blank for none): " choices
         valid_input=1
-        # ... rest of the function remains the same
+        # TODO: validate choices are valid
     done
 
     eval "$2=\$choices"
 }
-
-# prompt_cp_libraries() {
-#     # If $1 is "FE", then display frontend libraries, else display backend libraries
-#     local available_libraries
-#     if [ "$1" == "FE" ]; then
-#         available_libraries=("${!frontend_libraries[@]}")
-#     else
-#         available_libraries=("${!backend_libraries[@]}")
-#     fi
-
-#     log_major_step "Choose additional libraries to install"
-#     log "Available libraries: "
-#     for key in "${available_libraries[@]}"; do
-#         if [ "$1" == "FE" ]; then
-#             log "   $key. ${frontend_libraries[$key]}"
-#         else
-#             log "   $key. ${backend_libraries[$key]}"
-#         fi
-#     done
-#     log ""
-
-#     local choices valid_input
-#     valid_input=0
-#     while [ $valid_input -eq 0 ]; do
-#         read -p "Enter a comma-separated list of all libraries you wish to include (leave blank for none): " choices
-#         if [[ -z "$choices" ]]; then
-#             log "No libraries selected."
-#             valid_input=1
-#             continue
-#         fi
-
-#         # Check if choices are in the correct format and valid
-#         if [[ $choices =~ ^[0-9]+(,[0-9]+)*$ ]]; then
-#             IFS=',' read -r -a choices_array <<< "$choices"
-#             valid_input=1
-#             for choice in "${choices_array[@]}"; do
-#                 if ! [[ " ${available_libraries[*]} " =~ " $choice " ]]; then
-#                     log "Invalid choice: $choice. Please try again."
-#                     valid_input=0
-#                     break
-#                 fi
-#             done
-#         else
-#             log "Invalid format. Please enter a comma-separated list of numbers."
-#         fi
-#     done
-
-#     log "$choices"
-#     echo "$choices"
-# }
 
 
 prompt_boolean() {

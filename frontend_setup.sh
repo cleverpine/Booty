@@ -85,7 +85,7 @@ setup_angular() {
         git remote add origin $GIT_REMOTE_URL
     fi
 
-    # 8. Generate a new project from the skeleton using latet Angular versions
+    # 8. Generate a new project from the skeleton
     generate_new_project $PROJECT_DIR $LIBRARIES_CHOICE
 }
 
@@ -99,38 +99,23 @@ generate_new_project() {
         return 1
     fi
 
-    # 1. Perform a clean install of the skeleton project
-    log_major_step "Clean installing project..."
-    npm ci
-
-    # 2. Update Angular dependencies to latest versions
-    log_major_step "Updating Skeleton with latest Angular versions..."
-    ng update @angular/core @angular/cli --force
-    git checkout --orphan new-main
-    git add -A && git commit -m "Initial commit with updated structure"
-    ng_update_all_packages
-
-
-    # 3. Rename skeleton project to the project name provided
+    # 1. Rename skeleton project to the project name provided
     log_major_step "Renaming skeleton project to $PROJECT_DIR..."
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package.json
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package-lock.json
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" angular.json
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" docker-compose.yml
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" README.md
 
-    # 4. Regenerate package-lock.json
-    log_major_step "Regenerating package-lock.json..."
-    rm -rf node_modules
-    rm -f package-lock.json
-    npm install
-    git_add_commit_package_json "Update latest versions of Angular dependencies"
-    
+    # 2. Perform a clean install of the skeleton project
+    log_major_step "Clean installing project..."
+    npm ci
 
-    # 5. Install any libraries selected by the user
+    # 3. Install any libraries selected by the user
     log_major_step "Installing additional cp libraries..."
     install_additional_libraries "$CP_LIBRARIES_TO_INSTALL"
-    
-    # 6. Commit final changes
+
+    # 4. Commit final changes
     log_major_step "Committing final touches..."
     git add . && git commit -m "Install additional cp libraries"
 
@@ -138,44 +123,19 @@ generate_new_project() {
 }
 
 
-ng_update_all_packages() {
-    update_list=$(ng update | grep 'ng update @angular' 2>&1)
-    package_array=()  # Initialize an empty array to store package names
-
-    IFS=$'\n' # Split output into lines
-    for line in "$update_list"; do
-        if [[ $line == *'->'* ]]; then
-            package_name=$(echo "$line" | cut -d ' ' -f 1)
-            package_array+=("$package_name")  # Append the package name to the array
-        fi
-    done
-    unset IFS
-
-    # Construct and execute the update command if there are packages to update
-    if [ ${#package_array[@]} -ne 0 ]; then
-        echo "Updating all packages..."
-        ng update "${package_array[@]}"
-    else
-        echo "No packages to update."
-    fi
-}
-
-
 install_additional_libraries() {
     local LIBRARIES_CHOICE=$1
-    log "LIBRARIES_CHOICE: $LIBRARIES_CHOICE"
 
     # Convert choices into an array
     IFS=',' read -r -a LIBRARIES_CHOICE_ARRAY <<< "$LIBRARIES_CHOICE"
-    log "LIBRARIES_CHOICE_ARRAY: ${LIBRARIES_CHOICE_ARRAY[*]}"
 
     local npm_packages=()
     for choice in "${LIBRARIES_CHOICE_ARRAY[@]}"
     do
         for lib in "${frontend_libraries[@]}"; do
-            IFS=':' read -r key value <<< "$lib"
+            IFS=':' read -r key name version <<< "$lib"
             if [ "$key" == "$choice" ]; then
-                npm_packages+=("$value")
+                npm_packages+=("${name}@${version}")
                 break
             fi
         done
