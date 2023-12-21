@@ -19,7 +19,7 @@ setup_frontend() {
         setup_react
         ;;
         exit)
-        log "Exiting PineBoot."
+        log "Exiting Booty."
         exit 0
         ;;
         help)
@@ -34,17 +34,18 @@ setup_frontend() {
 
 setup_angular() {
     local START_DIR=$(pwd)
+    local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
+    local PROJECT_DIR
+    local SSH_DIR
+    local GIT_REMOTE_URL
+    local LIBRARIES_CHOICE
 
     # 1. Check prerequisites for setting up an Angular Project
     log_major_step "Checking prerequisites..."
     assert_angular_prerequisites
     log_major_step "Prerequisites met! Begin project setup."
 
-    local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
-    local PROJECT_DIR
-    local SSH_DIR
-    local GIT_REMOTE_URL
-    local LIBRARIES_CHOICE
+    
     
     # 2. Prompt for project name
     prompt_project_name PROJECT_DIR

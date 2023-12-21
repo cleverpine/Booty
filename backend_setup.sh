@@ -18,7 +18,7 @@ setup_backend() {
         log "Not implemented yet."
         ;;
         exit)
-        log "Exiting PineBoot."
+        log "Exiting Booty."
         exit 0
         ;;
         help)

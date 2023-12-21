@@ -50,8 +50,8 @@ display_help_menu() {
     echo "4. QA Automation service - Creates a QA automation service setup with testing frameworks."
     echo ""
     echo "Additional Commands:"
-    echo "'exit' - Close PineBoot."
-    echo "'version' - Display the current version of PineBoot."
+    echo "'exit' - Close Booty."
+    echo "'version' - Display the current version of Booty."
     echo ""
    
     local choice
@@ -61,7 +61,7 @@ display_help_menu() {
 
 # Function to display the main menu
 show_main_menu() {
-  echo "Welcome to PineBoot!"
+  echo "Welcome to Booty!"
   echo ""
   echo "Please select the type of project you want to set up:"
   echo "1. Entire Project"
@@ -102,11 +102,11 @@ handle_user_choice() {
       display_help_menu
       ;;
     exit)
-      echo "Exiting PineBoot."
+      echo "Exiting Booty."
       exit 0
       ;;
     version)
-      echo "PineBoot version: ${APP_VERSION}"
+      echo "Booty version: ${APP_VERSION}"
       # Or fetch the version dynamically if needed
       ;;
     *)

@@ -1,5 +1,6 @@
 source ./common.sh
 
+readonly BOOTY_CONFIGS_REPO_URL="https://github.com/cleverpine/pineboot-configurations.git"
 # Function that validates that the user has the prerequisites installed to setup an Angular project - Node, NPM, Angular CLI and Git
 assert_angular_prerequisites() {
     assert_node_is_present
