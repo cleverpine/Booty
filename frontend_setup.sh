@@ -37,7 +37,7 @@ setup_angular() {
     local GIT_REMOTE_URL
     local LIBRARIES_CHOICE
 
-    log "Verbose mode: $verbose"
+    log_verbose "Verbose mode activated."
 
     # 0. Fetch the Angular version used in the skeleton project 
     local angular_version_from_package=$(get_angular_version_from_package)
@@ -120,8 +120,12 @@ generate_new_project() {
     # 4. Commit final changes
     log_major_step "Committing final touches..."
     git add . && git commit -m "Initial commit - project setup"
+    
+    log_major_step "Project $PROJECT_DIR setup complete!"
 
-    return 0
+    # 5. Open the project in VS Code
+    log_major_step "Opening project in VS Code..."
+    code . -g README.md
 }
 
 

@@ -17,6 +17,7 @@ prompt_project_name() {
     eval "$1=\$PROJECT_DIR"
 }
 
+
 prompt_git_remote() {
     log ""
 
@@ -130,7 +131,7 @@ log_warning() {
 
 log_verbose() {
     if [ "$verbose" = 1 ]; then
-        log "$1"
+        log "[DEBUG] $1"
     fi
 }
 
