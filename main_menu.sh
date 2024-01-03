@@ -1,13 +1,11 @@
 #!/bin/bash
 
-source ./common.sh
-source ./frontend_setup.sh
-source ./backend_setup.sh
-
 readonly APP_VERSION=0.0.1
+readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
+readonly LOG_FILE="PB-Log-${current_timestamp}.log"
 readonly CURRENT_DIR=$(pwd)
 
-display_logo(){
+display_logo() {
         echo -e "${GREEN}"
         echo "                                                            "            
         echo "                                                            "            
@@ -80,22 +78,22 @@ show_main_menu() {
 handle_user_choice() {
   case $choice in
     1)
-      echo "You have selected \"Entire Project\"."
+      log_verbose "You have selected \"Entire Project\"."
       # Handle Entire Project setup
       ;;
     2)
-      echo "You have selected \"Back-end service\"."
+      log_verbose "You have selected \"Back-end service\"."
       setup_backend
       # Handle Back-end service setup
       ;;
     3)
-      echo "You have selected \"Front-end service\"."
+      log_verbose "You have selected \"Front-end service\"."
       # setup_git "Front-end"
       setup_frontend
       # Handle Front-end service setup
       ;;
     4)
-      echo "You have selected \"QA Automation service\"."
+      log_verbose "You have selected \"QA Automation service\"."
       # Handle QA Automation service setup
       ;;
     help)
@@ -116,10 +114,59 @@ handle_user_choice() {
   esac
 }
 
-# Other functions here (e.g., execute_git_commands, set_environment_variables, etc.)
 
 # Clear the screen
 # clear
+
+load_configurations() {
+  # Define locations
+  readonly FE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/angular-libraries.sh"
+  readonly BE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/spring-libraries.sh"
+  readonly LOCAL_CONFIG_DIR="./booty-configurations"
+
+  # Load Front-End Library Configurations
+  if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "angular-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" .
+  fi
+
+  # Load Back-End Library Configurations
+  if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "spring-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" .
+  fi
+}
+
+
+parse_args() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -v|--verbose)
+            echo "Verbose mode activated."
+            verbose=1
+            ;;
+        *)
+            # Handle other arguments if necessary
+            ;;
+    esac
+    shift
+  done
+}
+
+# Parse command line arguments
+parse_args "$@"
+load_configurations
+
+export verbose
+
+source ./common.sh
+source ./constants.sh
+source ./git_commands.sh
+source ./assertions.sh
+source ./frontend_setup.sh
+source ./backend_setup.sh
+source ./angular-libraries.sh
+source ./spring-libraries.sh
+
+exec > >(tee -a $LOG_FILE) 2>&1
 
 # Display the logo
 display_logo

@@ -1,6 +1,3 @@
-source ./common.sh
-source ./git_commands.sh
-source ./assertions.sh
 
 setup_frontend() {
   echo ""
@@ -34,19 +31,22 @@ setup_frontend() {
 
 setup_angular() {
     local START_DIR=$(pwd)
-    local SKELETON_REPO="git@github.com:cleverpine/angular-skeleton.git"
+    local SKELETON_REPO=$SSH_ANGULAR_SKELETON_CLONE_URL
     local PROJECT_DIR
     local SSH_DIR
     local GIT_REMOTE_URL
     local LIBRARIES_CHOICE
 
+    log_verbose "Verbose mode activated."
+
+    # 0. Fetch the Angular version used in the skeleton project 
+    local angular_version_from_package=$(get_angular_version_from_package)
+
     # 1. Check prerequisites for setting up an Angular Project
     log_major_step "Checking prerequisites..."
-    assert_angular_prerequisites
+    assert_angular_prerequisites $angular_version_from_package
     log_major_step "Prerequisites met! Begin project setup."
 
-    
-    
     # 2. Prompt for project name
     prompt_project_name PROJECT_DIR
 
@@ -56,7 +56,6 @@ setup_angular() {
     # 4. Configure Git remote repository (optional)
     prompt_git_remote GIT_REMOTE_URL
     
-
     # 5. Select all cp libraries you want to include
     prompt_cp_libraries "FE" LIBRARIES_CHOICE
 
@@ -66,21 +65,23 @@ setup_angular() {
     log "Git remote URL: $GIT_REMOTE_URL"
     log "Libraries to install: $LIBRARIES_CHOICE"
 
-
     # 6. Clone the Angular skeleton repository
     log_major_step "Cloning Angular skeleton repository..."
-
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
     cd $PROJECT_DIR
 
-    # 7. Check if git_remote_url is provided and add it as a remote
-    # if current directory is not the project directory, exit with error
+    # 7. Setup a fresh git repository
+    log_major_step "Setting up a fresh git repository..."
     if [ "$(basename $(pwd))" != "$PROJECT_DIR" ]; then
         log_error "Current directory is not the project directory. Exiting..."
         exit 1
     fi
 
-    git remote remove origin
+    log_verbose "Removing .git directory..."
+    rm -rf .git
+    log_verbose "Initializing new git repository with default branch main..."
+    git init -b main
+
     if [ -n "$GIT_REMOTE_URL" ]; then
         log_major_step "Adding provided Git URL as a remote..."
         git remote add origin $GIT_REMOTE_URL
@@ -118,9 +119,16 @@ generate_new_project() {
 
     # 4. Commit final changes
     log_major_step "Committing final touches..."
-    git add . && git commit -m "Install additional cp libraries"
+    git add . && git commit -m "Initial commit - project setup"
+    
+    log_major_step "Project $PROJECT_DIR setup complete!"
 
-    return 0
+    # 5. Open the project in VS Code
+    if [ -x "$(command -v code)" ]; then
+        log_major_step "Opening project in VS Code..."
+        code . -g README.md
+    fi
+    
 }
 
 
@@ -153,5 +161,9 @@ install_additional_libraries() {
 }
 
 
-
-
+get_angular_version_from_package() {
+    log_verbose "Fetching Angular version from package... $RAW_ANGULAR_SKELETON_PACKAGE_JSON"
+    local angular_version_from_package=$(curl -s $RAW_ANGULAR_SKELETON_PACKAGE_JSON | awk -F'[:,]' '/"@angular\/core"/ {gsub(/^[ \t"]+|[ \t",]+$/, "", $2); print $2}')
+    log_verbose "Angular version from package: $angular_version_from_package"
+    echo $angular_version_from_package
+}

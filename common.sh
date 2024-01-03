@@ -1,31 +1,3 @@
-source ./git_commands.sh
-
-export RED='\033[31m'
-export GREEN='\033[32m'
-export PURPLE='\033[35m'
-export YELLOW='\033[33m'
-export BOLD='\033[1m'
-export NC='\033[0m' # No Color
-
-# Backend libraries
-backend_libraries=(
-    "1:cp-spring-jpa-specification-resolver"
-    "2:cp-spring-error-util"
-    "3:cp-virava-spring-helper"
-    "4:cp-jpa-specification-resolver"
-    "5:cp-logging-library"
-)
-
-# Frontend libraries
-frontend_libraries=(
-    "1:cp-lht-header:0.0.6"
-    "2:cp-lht-sidebar:0.0.8"
-    "3:cp-lht-tile:0.0.6"
-    "4:primeng:17.1.0"
-    "5:syncfusion:latest" #???? 
-    "6:ng-openapi-gen:0.51.0"
-)
-
 
 prompt_project_name() {
     log ""
@@ -39,11 +11,12 @@ prompt_project_name() {
         log_error "Directory $PROJECT_DIR already exists. Please choose a different name."
         prompt_project_name $1
     else
-        log "Using project name: $PROJECT_DIR..."
+        log_verbose "Using project name: $PROJECT_DIR..."
     fi
 
     eval "$1=\$PROJECT_DIR"
 }
+
 
 prompt_git_remote() {
     log ""
@@ -56,22 +29,28 @@ prompt_git_remote() {
 configure_ssh() {
     log ""
 
-    user_prompt "Enter a specific SSH directory (leave blank for default): " SSH_DIR
-    if [ -z "$SSH_DIR" ]; then
-        log "Using default SSH directory."
-        SSH_DIR="$HOME/.ssh/id_rsa"
-    fi
+    while true; do
+        user_prompt "Enter a specific SSH directory (leave blank for default): " SSH_DIR
 
-    #if file with path $SSH_DIR does not exist, reprompt user
-    if [ ! -f "$SSH_DIR" ]; then
-        log_error "File $SSH_DIR does not exist. Please enter a valid path to an ssh key."
-        configure_ssh
-    else
-        log "Using SSH directory: $SSH_DIR..."
-    fi
+        # If the input is blank, use the default directory and break the loop
+        if [ -z "$SSH_DIR" ]; then
+            log_verbose "Using default SSH directory $HOME/.ssh/id_rsa..."
+            SSH_DIR="$HOME/.ssh/id_rsa"
+            break
+        fi
+
+        # Check if the file exists, if so, break the loop
+        if [ -f "$SSH_DIR" ]; then
+            log_verbose "Using SSH directory: $SSH_DIR..."
+            break
+        else
+            log_error "File $SSH_DIR does not exist. Please enter a valid path to an ssh key."
+        fi
+    done
 
     eval "$1=\$SSH_DIR"
 }
+
 
 prompt_cp_libraries() {
     local libraries=()
@@ -138,7 +117,7 @@ comma_separated_choice_to_array() {
 
 
 log() {
-    >&2 echo -e $1
+    echo -e $1 >&2 | tee -a $LOG_FILE
 
 }
 
@@ -146,6 +125,15 @@ log_error() {
     log "${RED}$1${NC}"
 }
 
+log_warning() {
+    log "${YELLOW}$1${NC}"
+}
+
+log_verbose() {
+    if [ "$verbose" = 1 ]; then
+        log "[DEBUG] $1"
+    fi
+}
 
 log_major_step() {
     log ""

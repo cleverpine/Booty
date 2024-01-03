@@ -1,6 +1,3 @@
-source ./common.sh
-source ./git_commands.sh
-source ./assertions.sh
 
 setup_backend() {
   echo ""
