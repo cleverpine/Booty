@@ -13,4 +13,5 @@ export GREEN='\033[32m'
 export PURPLE='\033[35m'
 export YELLOW='\033[33m'
 export BOLD='\033[1m'
+export UNDERLINE='\033[4m'
 export NC='\033[0m' # No Color

@@ -55,33 +55,54 @@ prompt_cp_libraries() {
     local libraries=()
     local library_keys=()
     local library_values=()
-    local library_names=() # New array for names without versions
+    local library_names=()
+    local library_descs=() # Array for library descriptions
 
     if [ "$1" == "FE" ]; then
         libraries=("0:none" "${frontend_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${frontend_libs_descriptions[@]}")
     else
         libraries=("0:none" "${backend_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${backend_libs_descriptions[@]}")
     fi
 
     # Extract keys, values, and names
     for i in "${libraries[@]}"; do
         IFS=':' read -r key name version <<< "$i"
         library_keys+=("$key")
-        library_values+=("$name@$version") # Combine name and version with @
-        library_names+=("$name") # Add only the name
+        library_values+=("$name@$version")
+        library_names+=("$name")
     done
-
-    log_major_step "Choose additional libraries to install"
-    log "Available libraries: "
-    for (( i=0; i<${#library_keys[@]}; i++ )); do
-        log "   ${library_keys[$i]}. ${library_names[$i]}" # Display name without version
-    done
-    log ""
 
     local choices=$2
     local valid_input=0
     while [ $valid_input -eq 0 ]; do
-        user_prompt "Enter a comma-separated list of libraries you wish to include, '0' for none (leave blank for all): " choices
+        log_major_step "Choose additional libraries to install"
+
+        if [[ "$choices" == "help" ]]; then
+            # Display library names with descriptions
+            for (( i=0; i<${#library_keys[@]}; i++ )); do
+                log "${BOLD}${library_keys[$i]}. ${library_names[$i]}:${NC}\n  ${library_descs[$i]}\n"
+
+            done
+            choices=""
+        else
+            # Display library names without descriptions
+            for (( i=0; i<${#library_keys[@]}; i++ )); do
+                log "${library_keys[$i]}. ${library_names[$i]}"
+            done
+        fi
+        log ""
+
+        if [[ "$choices" != "help" ]]; then
+            log "Type 'help' to see more detailed description for each library.\n"
+            user_prompt "Enter a comma-separated list of libraries you wish to include (leave blank for all): " choices
+        fi
+
+        # Check for 'help' input
+        if [[ "$choices" == "help" ]]; then
+            continue
+        fi
 
         # Check for blank input (select all libraries)
         if [ -z "$choices" ]; then
@@ -123,6 +144,8 @@ prompt_cp_libraries() {
 }
 
 
+
+
 prompt_boolean() {
     local prompt_message=$1
     local _varname=$2
@@ -148,9 +171,12 @@ comma_separated_choice_to_array() {
 }
 
 
+log_bolded() {
+      echo -e "${BOLD}$1${NC}" >&2 | tee -a $LOG_FILE    
+}
+
 log() {
     echo -e $1 >&2 | tee -a $LOG_FILE
-
 }
 
 log_error() {
