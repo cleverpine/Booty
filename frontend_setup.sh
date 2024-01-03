@@ -124,8 +124,11 @@ generate_new_project() {
     log_major_step "Project $PROJECT_DIR setup complete!"
 
     # 5. Open the project in VS Code
-    log_major_step "Opening project in VS Code..."
-    code . -g README.md
+    if [ -x "$(command -v code)" ]; then
+        log_major_step "Opening project in VS Code..."
+        code . -g README.md
+    fi
+    
 }
 
 

@@ -118,6 +118,24 @@ handle_user_choice() {
 # Clear the screen
 # clear
 
+load_configurations() {
+  # Define locations
+  readonly FE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/angular-libraries.sh"
+  readonly BE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/spring-libraries.sh"
+  readonly LOCAL_CONFIG_DIR="./booty-configurations"
+
+  # Load Front-End Library Configurations
+  if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "angular-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" .
+  fi
+
+  # Load Back-End Library Configurations
+  if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "spring-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" .
+  fi
+}
+
+
 parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -135,6 +153,7 @@ parse_args() {
 
 # Parse command line arguments
 parse_args "$@"
+load_configurations
 
 export verbose
 
@@ -144,6 +163,8 @@ source ./git_commands.sh
 source ./assertions.sh
 source ./frontend_setup.sh
 source ./backend_setup.sh
+source ./angular-libraries.sh
+source ./spring-libraries.sh
 
 exec > >(tee -a $LOG_FILE) 2>&1
 

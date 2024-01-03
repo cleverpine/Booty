@@ -7,8 +7,6 @@ readonly SSH_ANGULAR_SKELETON_CLONE_URL="git@github.com:cleverpine/angular-skele
 readonly angular_versions=("17.0.x" "16.1 || 16.2.x" "16.0.x" "15.1.x || 15.2.x" "15.0.x")
 readonly node_versions=("^18.13.0 || ^20.9.0" "^16.14.0 || ^18.10.0" "^16.14.0 || ^18.10.0" "^14.20.0 || ^16.13.0 || ^18.10.0" "^14.20.0 || ^16.13.0 || ^18.10.0")
 
-readonly FE_LIBRARY_CONFIG_LOCATION=""
-
 # Color codes used for logging
 export RED='\033[31m'
 export GREEN='\033[32m'
