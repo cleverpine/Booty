@@ -51,7 +51,6 @@ configure_ssh() {
     eval "$1=\$SSH_DIR"
 }
 
-
 prompt_cp_libraries() {
     local libraries=()
     local library_keys=()
@@ -59,9 +58,9 @@ prompt_cp_libraries() {
     local library_names=() # New array for names without versions
 
     if [ "$1" == "FE" ]; then
-        libraries=("${frontend_libraries[@]}")
+        libraries=("0:none" "${frontend_libraries[@]}")
     else
-        libraries=("${backend_libraries[@]}")
+        libraries=("0:none" "${backend_libraries[@]}")
     fi
 
     # Extract keys, values, and names
@@ -82,9 +81,42 @@ prompt_cp_libraries() {
     local choices=$2
     local valid_input=0
     while [ $valid_input -eq 0 ]; do
-        user_prompt "Enter a comma-separated list of all libraries you wish to include (leave blank for none): " choices
-        valid_input=1
-        # TODO: validate choices are valid
+        user_prompt "Enter a comma-separated list of libraries you wish to include, '0' for none (leave blank for all): " choices
+
+        # Check for blank input (select all libraries)
+        if [ -z "$choices" ]; then
+            choices=$(IFS=,; echo "${library_keys[*]:1}")
+            valid_input=1
+            continue
+        fi
+
+        # Check for 'none' selection
+        if [[ "$choices" == "0" ]]; then
+            choices=""
+            valid_input=1
+            continue
+        fi
+
+        # Normalize input by removing spaces
+        choices=$(echo "$choices" | sed 's/ //g')
+
+        # Validate input
+        IFS=',' read -ra selected_libs <<< "$choices"
+        local unique_libs=()
+        for lib in "${selected_libs[@]}"; do
+            if ! [[ $lib =~ ^[0-9]+$ ]] || [[ ! " ${library_keys[*]} " =~ " $lib " ]] || [[ " ${unique_libs[*]} " =~ " $lib " ]]; then
+                valid_input=0
+                log_error "Invalid input. Please enter valid library numbers separated by commas."
+                break
+            elif [[ $lib == "0" ]] && [[ ${#selected_libs[@]} -gt 1 ]]; then
+                valid_input=0
+                log_error "Invalid input. '0' cannot be combined with other selections."
+                break
+            else
+                valid_input=1
+                unique_libs+=("$lib")
+            fi
+        done
     done
 
     eval "$2=\$choices"
