@@ -151,8 +151,13 @@ parse_args() {
   done
 }
 
+# Delete old log files
+rm PB-Log-*.log
+
 # Parse command line arguments
 parse_args "$@"
+
+# Load library choice configurations
 load_configurations
 
 export verbose
