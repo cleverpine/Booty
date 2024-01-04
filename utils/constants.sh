@@ -1,7 +1,11 @@
+# Angular related
 readonly BOOTY_CONFIGS_REPO_URL="https://github.com/cleverpine/pineboot-configurations.git"
 readonly RAW_ANGULAR_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/angular-skeleton/main/package.json"
 readonly SSH_ANGULAR_SKELETON_CLONE_URL="git@github.com:cleverpine/angular-skeleton.git"
 
+# Spring Boot related
+readonly SPRING_INITIALIZR_JAR_URL="https://github.com/cleverpine/cp-spring-initializr/releases/download/v0.0.2/cp-spring-initializr-0.0.2.jar"
+readonly LOCAL_JAR_NAME="cp-spring-initializr.jar"
 
 # Compatibility versions according to Angular's documentation
 readonly angular_versions=("17.0.x" "16.1 || 16.2.x" "16.0.x" "15.1.x || 15.2.x" "15.0.x")

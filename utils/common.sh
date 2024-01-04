@@ -144,8 +144,6 @@ prompt_cp_libraries() {
 }
 
 
-
-
 prompt_boolean() {
     local prompt_message=$1
     local _varname=$2
@@ -170,36 +168,6 @@ comma_separated_choice_to_array() {
     echo "${array[@]}"
 }
 
-
-log_bolded() {
-      echo -e "${BOLD}$1${NC}" >&2 | tee -a $LOG_FILE    
-}
-
-log() {
-    echo -e $1 >&2 | tee -a $LOG_FILE
-}
-
-log_error() {
-    log "${BOLD}${RED}$1${NC}"
-}
-
-log_warning() {
-    log "${YELLOW}$1${NC}"
-}
-
-log_verbose() {
-    if [ "$verbose" = 1 ]; then
-        log "[DEBUG] $1"
-    fi
-}
-
-log_major_step() {
-    log ""
-    log "----------------------------------------------------------------------------------------------------------------------------"
-    log "${PURPLE}$1${NC}"
-    log "----------------------------------------------------------------------------------------------------------------------------"
-    log ""
-}
 
 library_numbers_to_names() {
     local library_numbers=$1
@@ -261,6 +229,17 @@ exec_cmd() {
         log_major_step "Error executing command: $COMMAND"
         cleanup
         exit 1
+    fi
+}
+
+# Doesn't exit when error
+exec_cmd_tol(){
+    local COMMAND=$1
+
+    if [ "$verbose" = 1 ]; then
+        eval "$COMMAND"
+    else
+        eval "$COMMAND" > /dev/null
     fi
 }
 

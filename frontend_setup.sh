@@ -157,10 +157,24 @@ install_additional_libraries() {
     # Install any libraries selected by the user
     if [ "${#npm_packages[@]}" -gt 0 ]; then
         for package in "${npm_packages[@]}"; do
-            error_log=$(npm install "$package" --save 2>&1 >/dev/null)
-            if [ $? -eq 0 ]; then
+            log_verbose "---------------------------------"
+            log_verbose "Installing $package..."
+            if [ "$verbose" = 1 ]; then
+                exec 3>&1  # Save the current state of stdout
+                error_log=$(npm install "$package" --save 2>&1 >&3)
+                status=$?  # Capture the exit status
+                exec 3>&-  # Close the temporary file descriptor
+            else
+                error_log=$(npm install "$package" --save 2>&1 >/dev/null)
+                status=$?  # Capture the exit status
+            fi
+            printf "%s\n" "$error_log" | tee -a $ERROR_LOG_FILE
+
+            if [ $status -eq 0 ]; then
+                log_verbose "Successfully installed $package"
                 successful_packages+=("$package")
             else
+                log_verbose "Failed to install $package"
                 failed_packages+=("$package")
                 error_logs+=("$error_log")
             fi
@@ -182,6 +196,10 @@ install_additional_libraries() {
         printf "    - %b%s%b\n" "${RED}${BOLD}" "${failed_packages[$i]}" "${NC}"
         printf '%s\n' "$(sed 's/^/\t/' <<< "${error_logs[$i]}")"
     done
+
+    if [ "${#failed_packages[@]}" -gt 0 ]; then
+        log_warning "\nSome libraries failed to install. You may want to install them manually."
+    fi
 }
 
 

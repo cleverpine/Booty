@@ -89,7 +89,6 @@ handle_user_choice() {
       ;;
     3)
       log_verbose "You have selected \"Front-end service\"."
-      # setup_git "Front-end"
       setup_frontend
       # Handle Front-end service setup
       ;;
@@ -164,15 +163,20 @@ load_configurations
 
 export verbose
 
-source ./common.sh
-source ./constants.sh
-source ./git_commands.sh
+# Link all the other files
+source ./utils/constants.sh
+source ./utils/logging.sh
+source ./utils/common.sh
+source ./utils/git_commands.sh
+
+source ./angular-libraries.sh
+source ./spring-libraries.sh
 source ./assertions.sh
 source ./frontend_setup.sh
 source ./backend_setup.sh
-source ./angular-libraries.sh
-source ./spring-libraries.sh
 
+
+# Log all output to a log file, error log to error_log file and everything to terminal
 exec > >(tee -a $LOG_FILE) 2> >(tee -a $ERROR_LOG_FILE >&2)
 
 # Display the logo
