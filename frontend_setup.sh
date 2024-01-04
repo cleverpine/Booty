@@ -78,13 +78,13 @@ setup_angular() {
     fi
 
     log_verbose "Removing .git directory..."
-    rm -rf .git
+    exec_cmd "rm -rf .git"
     log_verbose "Initializing new git repository with default branch main..."
-    git init -b main
+    exec_cmd "git init -b main"
 
     if [ -n "$GIT_REMOTE_URL" ]; then
         log_major_step "Adding provided Git URL as a remote..."
-        git remote add origin $GIT_REMOTE_URL
+        exec_cmd "git remote add origin $GIT_REMOTE_URL"
     fi
 
     # 8. Generate a new project from the skeleton
@@ -110,8 +110,9 @@ generate_new_project() {
     sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" README.md
 
     # 2. Perform a clean install of the skeleton project
-    log_major_step "Clean installing project..."
-    npm ci
+    log_major_step "Running npm ci..."
+    #if verbose disabled, silence npm ci
+    exec_cmd "npm ci"
 
     # 3. Install any libraries selected by the user
     log_major_step "Installing additional cp libraries..."
@@ -119,16 +120,15 @@ generate_new_project() {
 
     # 4. Commit final changes
     log_major_step "Committing final touches..."
-    git add . && git commit -m "Initial commit - project setup"
+    exec_cmd "git add . && git commit -m \"Initial commit - project setup\""
     
-    log_major_step "Project $PROJECT_DIR setup complete!"
+    log_major_step "Project ${YELLOW}${PROJECT_DIR}${NC}${PURPLE} setup complete!${NC}"
 
     # 5. Open the project in VS Code
     if [ -x "$(command -v code)" ]; then
         log_major_step "Opening project in VS Code..."
         code . -g README.md
     fi
-    
 }
 
 
@@ -139,6 +139,10 @@ install_additional_libraries() {
     IFS=',' read -r -a LIBRARIES_CHOICE_ARRAY <<< "$LIBRARIES_CHOICE"
 
     local npm_packages=()
+    local successful_packages=()
+    local failed_packages=()
+    local error_logs=()
+
     for choice in "${LIBRARIES_CHOICE_ARRAY[@]}"
     do
         for lib in "${frontend_libraries[@]}"; do
@@ -150,13 +154,51 @@ install_additional_libraries() {
         done
     done
 
-    log "npm_packages: ${npm_packages[*]}"
     # Install any libraries selected by the user
     if [ "${#npm_packages[@]}" -gt 0 ]; then
-        log_major_step "Installing selected packages..."
-        npm install "${npm_packages[@]}" --save
+        for package in "${npm_packages[@]}"; do
+            log_verbose "---------------------------------"
+            log_verbose "Installing $package..."
+            if [ "$verbose" = 1 ]; then
+                exec 3>&1  # Save the current state of stdout
+                error_log=$(npm install "$package" --save 2>&1 >&3)
+                status=$?  # Capture the exit status
+                exec 3>&-  # Close the temporary file descriptor
+            else
+                error_log=$(npm install "$package" --save 2>&1 >/dev/null)
+                status=$?  # Capture the exit status
+            fi
+            printf "%s\n" "$error_log" | tee -a $ERROR_LOG_FILE
+
+            if [ $status -eq 0 ]; then
+                log_verbose "Successfully installed $package"
+                successful_packages+=("$package")
+            else
+                log_verbose "Failed to install $package"
+                failed_packages+=("$package")
+                error_logs+=("$error_log")
+            fi
+        done
     else
         log "No additional libraries selected for install."
+    fi
+
+
+    # Display the report
+    log_major_step "Summary of additional library installations"
+    printf -- "\n- Successfully added libraries:\n"
+    for package in "${successful_packages[@]}"; do
+        printf "    - %b%s%b\n" "${GREEN}${BOLD}" "$package" "${NC}"
+    done
+
+    printf -- "\n\n- Errors installing the following libraries:\n"
+    for i in "${!failed_packages[@]}"; do
+        printf "    - %b%s%b\n" "${RED}${BOLD}" "${failed_packages[$i]}" "${NC}"
+        printf '%s\n' "$(sed 's/^/\t/' <<< "${error_logs[$i]}")"
+    done
+
+    if [ "${#failed_packages[@]}" -gt 0 ]; then
+        log_warning "\nSome libraries failed to install. You may want to install them manually."
     fi
 }
 
