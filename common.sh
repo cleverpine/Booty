@@ -180,7 +180,7 @@ log() {
 }
 
 log_error() {
-    log "${RED}$1${NC}"
+    log "${BOLD}${RED}$1${NC}"
 }
 
 log_warning() {
