@@ -1,18 +1,18 @@
 
 prompt_project_name() {
-    log ""
-    user_prompt "Enter name for your $service_type project: " PROJECT_DIR
+    while true; do
+        log ""
+        user_prompt "Enter name for your $service_type project: " PROJECT_DIR
 
-    if [ -z "$PROJECT_DIR" ]; then
-        log_error "You must select a project name."
-        prompt_project_name
-    #elif directory already exists remprompt user
-    elif [ -d "$PROJECT_DIR" ]; then
-        log_error "Directory $PROJECT_DIR already exists. Please choose a different name."
-        prompt_project_name $1
-    else
-        log_verbose "Using project name: $PROJECT_DIR..."
-    fi
+        if [ -z "$PROJECT_DIR" ]; then
+            log_error "You must select a project name."
+        elif [ -d "$PROJECT_DIR" ]; then
+            log_error "Directory $PROJECT_DIR already exists. Please choose a different name."
+        else
+            log_verbose "Using project name: $PROJECT_DIR..."
+            break
+        fi
+    done
 
     eval "$1=\$PROJECT_DIR"
 }
@@ -246,4 +246,31 @@ user_prompt() {
 
     # Assign the input to the variable whose name was passed
     eval "$_varname=\$_input"
+}
+
+exec_cmd() {
+    local COMMAND=$1
+
+    if [ "$verbose" = 1 ]; then
+        eval "$COMMAND"
+    else
+        eval "$COMMAND" > /dev/null
+    fi
+
+    if [ $? -ne 0 ]; then
+        log_major_step "Error executing command: $COMMAND"
+        cleanup
+        exit 1
+    fi
+}
+
+cleanup() {
+    if cd "$START_DIR"; then
+        if [ -n "$PROJECT_DIR" ] && [ -d "$PROJECT_DIR" ]; then
+            log_warning "Cleaning up after errors...\n"
+            rm -rf -- "$PROJECT_DIR"
+        fi
+    else
+        log_error "Failed to change to START_DIR. Cleanup aborted to prevent accidental data loss."
+    fi
 }

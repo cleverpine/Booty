@@ -3,6 +3,7 @@
 readonly APP_VERSION=0.0.1
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 readonly LOG_FILE="PB-Log-${current_timestamp}.log"
+readonly ERROR_LOG_FILE="PB-Error-Log-${current_timestamp}.log"
 readonly CURRENT_DIR=$(pwd)
 
 display_logo() {
@@ -153,6 +154,7 @@ parse_args() {
 
 # Delete old log files
 rm PB-Log-*.log
+rm PB-Error-Log-*.log
 
 # Parse command line arguments
 parse_args "$@"
@@ -171,7 +173,7 @@ source ./backend_setup.sh
 source ./angular-libraries.sh
 source ./spring-libraries.sh
 
-exec > >(tee -a $LOG_FILE) 2>&1
+exec > >(tee -a $LOG_FILE) 2> >(tee -a $ERROR_LOG_FILE >&2)
 
 # Display the logo
 display_logo
