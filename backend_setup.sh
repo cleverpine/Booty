@@ -76,7 +76,7 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
-        exec_cmd "java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose"
+        java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose
         java_status=$?
     else
         log_error "'CP-Spring-Initializr' could not be downloaded!"
