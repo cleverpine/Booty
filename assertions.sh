@@ -19,9 +19,12 @@ assert_angular_prerequisites() {
     else
         log_warning "Your setup is using Node version $node_version, which is not compatible with Angular $angular_version. "
         log_error "Booty currently requires one of the following compatible versions of Node: $node_version_range in order to function. \n"
+        log ""
+        log "Suggestion:"
         log "You can use nvm to install multiple versions of Node and switch between them."
         log "Otherwise, if you installed Node using Homebrew, you could run 'brew upgrade node' to upgrade to the latest version."
-        log "Visit https://angular.io/guide/versions#actively-supported-versions for more information."
+        log "Visit ${UNDERLINE}https://angular.io/guide/versions#actively-supported-versions${NC} for more information."
+        log ""
 
         exit 1
     fi
@@ -35,6 +38,14 @@ assert_angular_prerequisites() {
 assert_spring_boot_prerequisites() {
     assert_java_is_present
     assert_git_is_present
+
+    local minimum_java_version_required=$1
+    local java_version=$(java -XshowSettings:properties -version 2>&1 | grep 'java.runtime.version' | awk '{print $3}' | cut -d '.' -f1 | cut -d '-' -f1 | cut -d '+' -f1)    
+    if [ "$java_version" -lt "$minimum_java_version_required" ]; then
+        log_error "Your local Java version $java_version is not compatible with the required to work with a Spring Boot project created using this tool."
+        log "Please install Java $minimum_java_version_required or higher and try again."
+        exit 1
+    fi
 
     #log versions of each of the above
     log ""

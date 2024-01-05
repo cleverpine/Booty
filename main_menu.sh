@@ -1,6 +1,6 @@
 #!/bin/bash
 
-readonly APP_VERSION=0.0.2
+readonly APP_VERSION=0.0.3
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 readonly LOG_FILE="PB-Log-${current_timestamp}.log"
 readonly ERROR_LOG_FILE="PB-Error-Log-${current_timestamp}.log"

@@ -31,10 +31,11 @@ setup_backend() {
 setup_spring_boot() {
     local START_DIR=$(pwd)
 
+    local java_version_from_initializr_config=$(get_java_version_from_initializr_config)
 
     # 1. Check if Java and Git are installed
     log_major_step "Checking prerequisites..."
-    assert_spring_boot_prerequisites
+    assert_spring_boot_prerequisites $java_version_from_initializr_config
     log_major_step "Prerequisites met! Begin project setup."
 
     # 2. Prompt for project name
@@ -75,7 +76,7 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
-        java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose
+        exec_cmd "java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose"
         java_status=$?
     else
         log_error "'CP-Spring-Initializr' could not be downloaded!"
@@ -92,4 +93,10 @@ setup_spring_boot() {
 
     # 10. Delete the downloaded jar file
     rm -f cp-spring-initializr.jar
+}
+
+
+get_java_version_from_initializr_config() {
+    local java_version_from_initializr_config=$(curl -sSfL "$RAW_SPRING_INITIALIZR_CONFIG" | grep -A 2 "javaVersions:" | grep "id:" | awk -F: '{print $2}' | tr -d ' ')
+    echo $java_version_from_initializr_config
 }
