@@ -22,7 +22,7 @@ steps:
     tag: '$(appVersion)'
     releaseTitle: 'Release $(appVersion)'
 
-- publish: $(System.DefaultWorkingDirectory)
+- publish: $(System.DefaultWorkingDirectory)appVersion.txt
   artifact: appVersionArtifact
   displayName: 'Publish appVersion Artifact'
 
