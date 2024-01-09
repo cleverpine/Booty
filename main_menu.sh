@@ -1,41 +1,43 @@
 #!/bin/bash
 
-readonly APP_VERSION=0.0.3
+
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 readonly LOG_FILE="PB-Log-${current_timestamp}.log"
 readonly ERROR_LOG_FILE="PB-Error-Log-${current_timestamp}.log"
 readonly CURRENT_DIR=$(pwd)
 
 display_logo() {
-        echo -e "${GREEN}"
-        echo "                                                            "            
-        echo "                                                            "            
-        echo "                                                            "            
-        echo "                          ##                                "    
-        echo "                        ######                              "            
-        echo "                      ##########                            "            
-        echo "                    ##############                          "            
-        echo "             #     ################      #                  "            
-        echo "             ####     ##########      ####                  "            
-        echo "             ######      ####      #######                  "            
-        echo "             #########           #########                  "            
-        echo "             ##########         ##########                  "            
-        echo "             #######      ###      #######                  "
-        echo "       #     ####      ########       ####    #             "
-        echo "       ###          ##############          ###             "
-        echo "       ######      ################      ######             "
-        echo "       #########      ##########      #########             "
-        echo "        ###########      ####      ###########              "
-        echo -e "${NC}"
-        echo "                                                             "
-        echo "   _____  _               ____                 _             "
-        echo "  |  __ \(_)             |  _ \               | |            "
-        echo "  | |__) |_  _ __    ___ | |_) |  ___    ___  | |_           "
-        echo "  |  ___/| || '_ \  / _ \|  _ <  / _ \  / _ \ | __|          "
-        echo "  | |    | || | | ||  __/| |_) || (_) || (_) || |_           "
-        echo "  |_|    |_||_| |_| \___||____/  \___/  \___/  \__|          "
-        echo "                                                             "            
-        echo "                                                             "  
+
+echo -e "${GREEN}"                                                                                      
+echo "                                 #####                                          "
+echo "                               #########                                        "
+echo "                             #############                                      "
+echo "                           #################                                    "
+echo "                     ####    #############    ####                              "
+echo "                     #######    #######    #######                              "
+echo "                     ##########         ##########                              "
+echo "                     ###########       ###########                              "
+echo "                      #######    ####    ########                               "
+echo "                      ####    ###########    ####                               "
+echo "                ####       #################       ####                         "
+echo "                ########   #################   ########                         "
+echo "                ###########    #########    ###########                         "
+echo "                ##############    ###    ##############                         "
+echo -e "                 ###############       ############### ${NC}                 "
+echo -e "  ############   ${GREEN}############           #############${NC}  ####     "
+echo -e " ###############   ${GREEN} #######                 #######${NC}    #####    "
+echo " ####       #####                                      #####                    "
+echo " ####       #####     ##########       #########    ###########   ####      ### "
+echo " ###############    ##############   ############## ###########  #####     #### "
+echo " ###############   #####      ##### #####     ######   #####     #####     #### "
+echo " ####       #####  ####       ##########       #####   #####     #####     #### "
+echo " ####        ####  #####      ##### #####      #####   #####      ####     #### "
+echo " ################   ##############  ###############    #########  ############# "
+echo " ###############     ############     ###########       #######    ############ "
+echo "                                                                   ##      #### "
+echo "                                                                  ############# "
+echo "                                                                   ###########  "
+                                                                                  
 #                                                    
 # 
 }
@@ -105,7 +107,7 @@ handle_user_choice() {
       ;;
     version)
       echo "Booty version: ${APP_VERSION}"
-      # Or fetch the version dynamically if needed
+      show_main_menu
       ;;
     *)
       echo "Oops! The number you entered doesn't match any of the available options. Please try again, or type 'help' for more information."
@@ -164,7 +166,7 @@ load_configurations
 export verbose
 
 # Link all the other files
-source ./utils/constants.sh
+source ./config.sh
 source ./utils/logging.sh
 source ./utils/common.sh
 source ./utils/git_commands.sh
