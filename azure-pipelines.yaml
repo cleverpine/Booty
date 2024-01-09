@@ -26,11 +26,21 @@ steps:
   artifact: appVersionArtifact
   displayName: 'Publish appVersion Artifact'
 
-- task: TriggerPipeline@2
+- task: TriggerBuild@4
   inputs:
-    serviceConnection: 'Azure-DevOps-Dobry'
-    project: 'CleverPine Platform'
-    Pipeline: 'Build'
-    buildDefinition: cleverpine.homebrew-booty
-    Branch: 'cicd'
-    buildapiversion: '6.0'
+    definitionIsInCurrentTeamProject: true
+    buildDefinition: '436'
+    queueBuildForUserThatTriggeredBuild: true
+    ignoreSslCertificateErrors: false
+    useSameSourceVersion: false
+    useCustomSourceVersion: false
+    useSameBranch: true
+    waitForQueuedBuildsToFinish: false
+    storeInEnvironmentVariable: false
+    authenticationMethod: 'Personal Access Token'
+    password: '$(Dobry_PAT)'
+    enableBuildInQueueCondition: false
+    dependentOnSuccessfulBuildCondition: false
+    dependentOnFailedBuildCondition: false
+    checkbuildsoncurrentbranch: false
+    failTaskIfConditionsAreNotFulfilled: false
