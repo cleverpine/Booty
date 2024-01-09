@@ -29,7 +29,7 @@ steps:
 - task: TriggerBuild@4
   inputs:
     definitionIsInCurrentTeamProject: true
-    buildDefinition: '436'
+    buildDefinition: 'cleverpine.homebrew-booty'
     queueBuildForUserThatTriggeredBuild: true
     ignoreSslCertificateErrors: false
     useSameSourceVersion: false
