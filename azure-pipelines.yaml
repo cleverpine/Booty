@@ -1,14 +1,6 @@
 trigger:
 - main
 
-resources:
-  pipelines:
-  - pipeline: SecondPipeline
-    source: cleverpine.homebrew-booty
-    trigger:
-      branches:
-        - cicd
-
 pool:
   vmImage: 'ubuntu-latest'
 
