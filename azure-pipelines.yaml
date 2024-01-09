@@ -26,3 +26,11 @@ steps:
   artifact: appVersionArtifact
   displayName: 'Publish appVersion Artifact'
 
+- task: TriggerPipeline@2
+  inputs:
+    serviceConnection: 'Azure-DevOps-Dobry'
+    project: 'CleverPine Platform'
+    Pipeline: 'Build'
+    buildDefinition: cleverpine.homebrew-booty
+    Branch: 'cicd'
+    buildapiversion: '6.0'
