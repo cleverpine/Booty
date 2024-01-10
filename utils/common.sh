@@ -61,10 +61,17 @@ prompt_cp_libraries() {
     if [ "$1" == "FE" ]; then
         libraries=("0:none" "${frontend_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${frontend_libs_descriptions[@]}")
-    else
+    elif [ "$1" == "SPRING" ]; then
         libraries=("0:none" "${backend_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${backend_libs_descriptions[@]}")
+    elif [ "$1" == "QUARKUS" ]; then
+        libraries=("0:none" "${quarkus_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${quarkus_libraries_descriptions[@]}")
+    else 
+        log_error "Invalid service type: $1"
+        exit 1
     fi
+
 
     # Extract keys, values, and names
     for i in "${libraries[@]}"; do
@@ -199,6 +206,40 @@ library_numbers_to_names() {
     echo "${library_names%, }"
 }
 
+
+library_numbers_to_names_and_versions() {
+    local library_numbers=$1
+    local service_type=$2
+    local library_names_and_versions=()
+    local IFS=','
+    local libraries=()
+
+    if [ "$service_type" == "FE" ]; then
+        libraries=("${frontend_libraries[@]}")
+    elif [ "$service_type" == "SPRING" ]; then
+        libraries=("${backend_libraries[@]}")
+    elif [ "$service_type" == "QUARKUS" ]; then
+        libraries=("${quarkus_libraries[@]}")
+    else 
+        log_error "Invalid service type: $service_type"
+        return 1
+    fi
+
+    for number in $library_numbers; do
+        for lib in "${libraries[@]}"; do
+            IFS=':' read -r key name version <<< "$lib"
+            if [ "$key" == "$number" ]; then
+                library_names_and_versions+=("${name}:${version}")
+                break
+            fi
+        done
+    done
+
+    # Echo the array elements
+    echo "${library_names_and_versions[@]}"
+}
+
+
 user_prompt() {
     local prompt_message=$1
     local _varname=$2
@@ -220,20 +261,21 @@ exec_cmd() {
     local COMMAND=$1
 
     if [ "$verbose" = 1 ]; then
-        eval "$COMMAND"
+        log_verbose "Executing command: ${COMMAND}"
+        eval "${COMMAND}"
     else
-        eval "$COMMAND" > /dev/null
+        eval "${COMMAND}" >/dev/null
     fi
 
     if [ $? -ne 0 ]; then
-        log_major_step "Error executing command: $COMMAND"
+        log_major_step "Error executing command: ${COMMAND}"
         cleanup
         exit 1
     fi
 }
 
 # Doesn't exit when error
-exec_cmd_tol(){
+exec_cmd_tol() {
     local COMMAND=$1
 
     if [ "$verbose" = 1 ]; then

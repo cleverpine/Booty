@@ -54,6 +54,14 @@ assert_spring_boot_prerequisites() {
 
 }
 
+assert_quarkus_prerequisites() {
+    assert_java_is_present
+    assert_git_is_present
+
+    #use mvnw
+}
+
+
 assert_node_is_present() {
     log_verbose "Checking for Node..."
     if ! command -v node &> /dev/null

@@ -124,6 +124,8 @@ load_configurations() {
   # Define locations
   readonly FE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/angular-libraries.sh"
   readonly BE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/spring-libraries.sh"
+  readonly QUARKUS_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/quarkus-libraries.sh"
+  
   readonly LOCAL_CONFIG_DIR="./booty-configurations"
 
   # Load Front-End Library Configurations
@@ -173,6 +175,8 @@ source ./utils/git_commands.sh
 
 source ./angular-libraries.sh
 source ./spring-libraries.sh
+source ./quarkus-libraries.sh
+
 source ./assertions.sh
 source ./frontend_setup.sh
 source ./backend_setup.sh
