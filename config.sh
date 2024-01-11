@@ -2,6 +2,10 @@
 APP_VERSION="0.0.4"
 CP_INITIALIZR_VERSION="0.0.4"
 
+# Quarkus related
+readonly QUARKUS_VERSION="3.6.4"
+readonly QUARKUS_MIN_JAVA_VERSION="17"
+
 # Angular related
 readonly BOOTY_CONFIGS_REPO_URL="https://github.com/cleverpine/pineboot-configurations.git"
 readonly RAW_ANGULAR_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/angular-skeleton/main/package.json"
