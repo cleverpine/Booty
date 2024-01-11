@@ -12,7 +12,7 @@ setup_backend() {
         setup_spring_boot
         ;;
         2)
-        log "Not implemented yet."
+        setup_quarkus
         ;;
         exit)
         log "Exiting Booty."
@@ -26,6 +26,102 @@ setup_backend() {
         ;;
     esac
 }
+
+setup_quarkus() {
+    local MAIN_DIR=$(pwd)
+    local PROJECT_TYPE="QUARKUS"
+    local project_dir
+    local ssh_dir
+    local git_remote_url
+    local selected_libraries
+    local selected_libraries_names_and_versions
+    local should_include_api
+    
+    # 1. Check if Java and Git are installed
+    cmd
+    log_major_step "Checking prerequisites..."
+    assert_quarkus_prerequisites
+    log_major_step "Prerequisites met! Begin project setup."
+    
+    # 2. Prompt for project name
+    prompt_project_name project_dir
+
+    # 3. Configure SSH directory
+    configure_ssh ssh_dir
+
+    # 4. Configure Git remote repository (optional)
+    prompt_git_remote git_remote_url
+
+    # 5. Select all cp libraries you want to include and convert them to names with versions
+    prompt_cp_libraries $PROJECT_TYPE selected_libraries
+    log_verbose "Libraries selected: ${selected_libraries}"
+    read -a selected_libraries_names_and_versions <<< "$(library_numbers_to_names_and_versions "${selected_libraries}" $PROJECT_TYPE)"
+    log_verbose "Libraries that will be installed in the quarkus project: ${selected_libraries_names_and_versions[*]}"
+
+    # 6. Prompt for including Open API generator plugin
+    prompt_boolean "Would you like to include Open API generator?" should_include_api
+   
+
+    # All the variables are set, now we can start generating the project
+    log_major_step "Using configuration:"
+    log "Project name: $project_dir"
+    log "SSH directory: $ssh_dir"
+    log "Git remote URL: $git_remote_url"
+    log "Libraries: $selected_libraries_names_and_versions"
+    log "Include api: $should_include_api"
+
+
+    #Step 1: Generate the project
+    log_major_step "Generating Quarkus project..."
+    # mvnw quarkus:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${PROJECT_DIR}
+    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_dir} -DprojectVersion=0.0.1 -DjavaVersion=17" #TODO: java version
+    eval $command
+    local command_status=$?
+
+    if [ $command_status -ne 0 ]; then
+        log_error "Project generation failed!"
+        return $command_status
+    fi
+
+    #Step 2: Add the libraries
+    for library in "${selected_libraries_names_and_versions[@]}"; do
+        add_maven_dependency $project_dir $library
+    done
+
+    #Step 3: TODO: Add the Open API generator plugin 
+
+
+    log "Successfully generated project '$project_dir'."
+}
+
+add_maven_dependency() {
+    local project_name=$1
+    local dependency_name_version=$2
+    local dependency_name=$(echo "$dependency_name_version" | cut -d ':' -f 1)
+    local dependency_version=$(echo "$dependency_name_version" | cut -d ':' -f 2)
+
+    log_verbose "Adding dependency: $dependency_name:$dependency_version to pom.xml"
+
+    # Define the path to the pom.xml file
+    local pom_file="${project_name}/pom.xml"
+
+    # Define the dependency tag
+    local dependency_tag="    <dependency>\n        <groupId>com.cleverpine</groupId>\n        <artifactId>$dependency_name</artifactId>\n        <version>$dependency_version</version>\n    </dependency>"
+
+    # Find the line number of the last </dependencies> tag
+    local dependencies_end_line=$(grep -n '</dependencies>' "$pom_file" | tail -1 | cut -d: -f1)
+
+    if [[ -n "$dependencies_end_line" ]]; then
+        # Split the file at this line and insert the dependency tag
+        head -n $(($dependencies_end_line - 1)) "$pom_file" > temp
+        echo -e "$dependency_tag" >> temp
+        tail -n +$dependencies_end_line "$pom_file" >> temp
+        mv temp "$pom_file"
+    else
+        log_verbose "No </dependencies> tag found in $pom_file. Dependency not added."
+    fi
+}
+
 
 
 setup_spring_boot() {
@@ -48,7 +144,7 @@ setup_spring_boot() {
     prompt_git_remote GIT_REMOTE_URL
 
     # 5. Select all cp libraries you want to include
-    prompt_cp_libraries "BE" LIBRARIES_CHOICE
+    prompt_cp_libraries "SPRING" LIBRARIES_CHOICE
     LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "BE")
 
     # 6. Prompt for including Open API generator plugin
