@@ -15,7 +15,7 @@ steps:
 
 - task: GitHubRelease@1
   inputs:
-    gitHubConnection: 'github-dobry-serviceconnection'
+    gitHubConnection: 'cleverpine-github-serviceaccount'
     repositoryName: 'cleverpine/Booty'
     action: 'create'
     tagSource: 'userSpecifiedTag'
