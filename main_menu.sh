@@ -71,6 +71,10 @@ show_main_menu() {
   echo "4. QA Automation service"
   echo ""
 
+  if [ -n "$verbose" ] && [ "$verbose" -eq 1 ]; then    
+    echo "Verbose mode is active"
+  fi
+
   local choice
   user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
 
@@ -137,6 +141,11 @@ load_configurations() {
   if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "spring-libraries.sh"; then
     cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" .
   fi
+
+  # Load Quarkus Library Configurations
+  if ! curl -sSfL "${QUARKUS_LIBRARY_CONFIG_LOCATION}" -o "quarkus-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/quarkus-libraries.sh" .
+  fi
 }
 
 
@@ -144,7 +153,6 @@ parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
         -v|--verbose)
-            echo "Verbose mode activated."
             verbose=1
             ;;
         *)

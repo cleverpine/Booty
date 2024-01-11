@@ -41,11 +41,13 @@ assert_spring_boot_prerequisites() {
 
     local minimum_java_version_required=$1
     local java_version=$(java -XshowSettings:properties -version 2>&1 | grep 'java.runtime.version' | awk '{print $3}' | cut -d '.' -f1 | cut -d '-' -f1 | cut -d '+' -f1)    
-    if [ "$java_version" -lt "$minimum_java_version_required" ]; then
-        log_error "Your local Java version $java_version is not compatible with the required to work with a Spring Boot project created using this tool."
-        log "Please install Java $minimum_java_version_required or higher and try again."
-        exit 1
-    fi
+    
+    assert_java_version_greater_than_minimum_required "$java_version" "$minimum_java_version_required" "Spring Boot"    
+    # if [ ]; then
+    #     log_error "Your local Java version $java_version is not compatible with the required to work with a Spring Boot project created using this tool."
+    #     log "Please install Java $minimum_java_version_required or higher and try again."
+    #     exit 1
+    # fi
 
     #log versions of each of the above
     log ""
@@ -58,9 +60,30 @@ assert_quarkus_prerequisites() {
     assert_java_is_present
     assert_git_is_present
 
-    #use mvnw
+    local java_version=$(java -XshowSettings:properties -version 2>&1 | grep 'java.runtime.version' | awk '{print $3}' | cut -d '.' -f1 | cut -d '-' -f1 | cut -d '+' -f1)    
+    local minimum_java_version_required=$QUARKUS_MIN_JAVA_VERSION
+    local project_type="Quarkus"
+
+    assert_java_version_greater_than_minimum_required "$java_version" "$minimum_java_version_required" "$project_type"
+
+    log ""
+    log "Java version: $(java --version)"
+    log "Git version: $(git --version)"
 }
 
+assert_java_version_greater_than_minimum_required() {
+    local java_version=$1
+    local minimum_java_version_required=$2
+    local project_type=$3
+
+    if [ "$java_version" -lt "$minimum_java_version_required" ]; then
+        log_error "Your local Java version $java_version is not compatible with the required to work with a ${project_type} project created using this tool."
+        log "Please install Java $minimum_java_version_required or higher and try again."
+        exit 1
+    fi
+
+    log_verbose "Java version $java_version is compatible with the required to work with a ${project_type} project."
+}
 
 assert_node_is_present() {
     log_verbose "Checking for Node..."
