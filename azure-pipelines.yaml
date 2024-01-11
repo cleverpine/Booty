@@ -9,9 +9,10 @@ steps:
 - script: |
     # Extracting the version number from the config.sh file
     VERSION_LINE=$(sed -n '2p' ./config.sh)
-    APP_VERSION=$(echo v$VERSION_LINE | cut -d '"' -f 2)
-    echo v$APP_VERSION > appVersion.txt
-    echo "##vso[task.setvariable variable=appVersion]$APP_VERSION"
+    APP_VERSION=$(echo $VERSION_LINE | cut -d '"' -f 2)
+    echo "v$APP_VERSION" > appVersion.txt
+    echo "##vso[task.setvariable variable=appVersion]v$APP_VERSION"
+
   displayName: 'Extract App Version'
 
 - task: GitHubRelease@1
