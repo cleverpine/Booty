@@ -21,7 +21,9 @@ steps:
     action: 'create'
     tagSource: 'userSpecifiedTag'
     tag: '$(appVersion)'
-    releaseTitle: 'Release $(appVersion)'
+    title: '$(appVersion)'
+    changeLogType: issueBased
+
 
 - publish: $(System.DefaultWorkingDirectory)/appVersion.txt
   artifact: appVersionArtifact
