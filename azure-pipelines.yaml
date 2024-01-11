@@ -9,7 +9,7 @@ steps:
     # Extracting the version number from the config.sh file
     VERSION_LINE=$(sed -n '2p' ./config.sh)
     APP_VERSION=$(echo $VERSION_LINE | cut -d '"' -f 2)
-    echo $APP_VERSION > appVersion.txt
+    echo v$APP_VERSION > appVersion.txt
     echo "##vso[task.setvariable variable=appVersion]$APP_VERSION"
   displayName: 'Extract App Version'
 
