@@ -38,7 +38,7 @@ steps:
     useSameSourceVersion: false
     useCustomSourceVersion: false
     useSameBranch: false
-    branchToUse: 'cicd'
+    branchToUse: 'main'
     waitForQueuedBuildsToFinish: false
     storeInEnvironmentVariable: false
     authenticationMethod: 'Personal Access Token'
