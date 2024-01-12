@@ -1,41 +1,96 @@
 # Booty v0.0.5
 
-Booty CLI Tool
-Description
-Booty is a command-line interface tool developed for Cleverpine employees to streamline the process of setting up and configuring projects in line with the latest technological standards. It integrates seamlessly with company-developed libraries, ensuring a standardized approach across various project types.
+## Description
+Booty is a command-line interface tool designed for Cleverpine employees, simplifying the process of setting up and configuring projects in alignment with the latest technological standards and company-specific libraries.
 
-Booty offers the capability to set up diverse types of projects, including:
+Booty enables the setup of various project types, including:
 
-Entire Projects: Combines front-end, back-end, and QA automation services into a complete project structure.
-Back-end Services: Supports technologies like Spring Boot and Quarkus, tailored for robust server-side development.
-Front-end Services: Facilitates the creation of front-end services using technologies such as Angular and React.
-QA Automation Services: Sets up projects with necessary frameworks for Quality Assurance and automated testing.
-Additionally, Booty features a verbose mode, which provides detailed output during the setup process, offering insights into the operations being performed.
+Entire Projects: Integrating front-end, back-end, and QA automation services.
+Back-end Services: Tailored for technologies like Spring Boot and Quarkus.
+Front-end Services: Facilitating creation using Angular, React, and other front-end technologies.
+QA Automation Services: Establishing projects with necessary frameworks for Quality Assurance and automated testing.
 
-Installation
-To install Booty, use Homebrew by running the following command:
+## Installation
+To install Booty, use Homebrew:
 
-bash
-Copy code
+```
 brew tap cleverpine/booty
 brew install booty
-Configuration
-Upon installation, no further configuration is necessary.
+```
 
-Usage
-Starting Booty
-To initiate the Booty CLI, simply enter the following command in your terminal:
+## Configuration
+No additional configuration is needed after installation.
 
-bash
-Copy code
+## Usage
+Start the Booty CLI with:
+
+```
 booty
-Navigation and Selection
-Booty's user interface is intuitive, guiding you through various options for setting up your desired project type. Select from the main menu to start configuring your project.
+```
 
-Reference to Available Libraries
-Within the booty-configurations folder, you will find files such as angular-libraries.sh, spring-libraries.sh, and quarkus-libraries.sh. These files are crucial references that list the available Cleverpine libraries (and others) that can be included during the project setup process.
+Enabling Verbose Mode
+Verbose mode provides detailed output during the setup process. To enable it, start Booty with the -v flag:
 
-Exiting Booty
-You can exit the Booty CLI at any point by typing exit.
+```
+booty -v/--verbose
+```
 
-This revised README.md provides a more detailed overview of the Booty CLI tool, focusing on the types of projects you can set up and including a mention of the verbose mode. The description of the booty-configurations folder and its contents offers a clear reference point for available libraries. If further modifications or additional details are required, feel free to let me know.
+
+### Project Setup
+Follow the intuitive UI in the Booty CLI to select and configure your project.
+
+### Library Reference
+Refer to angular-libraries.sh, spring-libraries.sh, and quarkus-libraries.sh in the booty-configurations folder for a list of available libraries to include in your project setup.
+
+### Exiting Booty
+Exit the CLI at any time by typing exit.
+
+
+### Example of use when setting up a Spring Boot project
+
+```
+Please select the type of backend you want to set up:
+1. Spring Boot
+2. Quarkus
+
+Enter the number of your choice (or type 'help' for more options): 2
+
+----------------------------------------------------------------------------------------------------------------------------
+Checking prerequisites...
+----------------------------------------------------------------------------------------------------------------------------
+
+[VERBOSE] Checking for Java...
+[VERBOSE] Checking for Git...
+[VERBOSE] Java version 17 is compatible with the required to work with a Quarkus project.
+
+Java version: openjdk 17 2021-09-14 OpenJDK Runtime Environment (build 17+35-2724) OpenJDK 64-Bit Server VM (build 17+35-2724, mixed mode, sharing)
+Git version: git version 2.33.0
+
+----------------------------------------------------------------------------------------------------------------------------
+Prerequisites met! Begin project setup.
+----------------------------------------------------------------------------------------------------------------------------
+
+
+Enter name for your  project:  new-quarkus-project
+[VERBOSE] Using project name: new-quarkus-project...
+
+Enter a specific SSH directory (leave blank for default):  
+[VERBOSE] Using default SSH directory /Users/ivannikolov/.ssh/id_rsa...
+
+Paste a clone URL (leave blank if none):  
+
+----------------------------------------------------------------------------------------------------------------------------
+Choose additional libraries to install
+----------------------------------------------------------------------------------------------------------------------------
+
+0. none
+1. cp-spring-jpa-specification-resolver
+2. cp-spring-error-util
+3. cp-virava-spring-helper
+4. cp-jpa-specification-resolver
+5. cp-logging-library
+
+Type 'help' to see more detailed description for each library.
+
+Enter a comma-separated list of libraries you wish to include (leave blank for all):  
+```
