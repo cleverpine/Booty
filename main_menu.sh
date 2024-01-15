@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 readonly LOG_FILE="PB-Log-${current_timestamp}.log"
 readonly ERROR_LOG_FILE="PB-Error-Log-${current_timestamp}.log"
@@ -176,18 +176,18 @@ load_configurations
 export verbose
 
 # Link all the other files
-source ./config.sh
-source ./utils/logging.sh
-source ./utils/common.sh
-source ./utils/git_commands.sh
+source "${SCRIPT_DIR}/config.sh"
+source "${SCRIPT_DIR}/utils/logging.sh"
+source "${SCRIPT_DIR}/utils/common.sh"
+source "${SCRIPT_DIR}/utils/git_commands.sh"
 
-source ./angular-libraries.sh
-source ./spring-libraries.sh
-source ./quarkus-libraries.sh
+source "${SCRIPT_DIR}/angular-libraries.sh"
+source "${SCRIPT_DIR}/spring-libraries.sh"
+source "${SCRIPT_DIR}/quarkus-libraries.sh"
 
-source ./assertions.sh
-source ./frontend_setup.sh
-source ./backend_setup.sh
+source "${SCRIPT_DIR}/assertions.sh"
+source "${SCRIPT_DIR}/frontend_setup.sh"
+source "${SCRIPT_DIR}/backend_setup.sh"
 
 
 # Log all output to a log file, error log to error_log file and everything to terminal
