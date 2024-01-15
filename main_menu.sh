@@ -132,7 +132,7 @@ load_configurations() {
   readonly BE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/spring-libraries.sh"
   readonly QUARKUS_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/quarkus-libraries.sh"
   
-  readonly LOCAL_CONFIG_DIR="./booty-configurations"
+  readonly LOCAL_CONFIG_DIR="${SCRIPT_DIR}/booty-configurations"
 
   # Load Front-End Library Configurations
   if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "angular-libraries.sh"; then
