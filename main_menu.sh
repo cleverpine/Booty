@@ -135,18 +135,18 @@ load_configurations() {
   readonly LOCAL_CONFIG_DIR="${SCRIPT_DIR}/booty-configurations"
 
   # Load Front-End Library Configurations
-  if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "angular-libraries.sh"; then
-    cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" .
+  if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/angular-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" "${SCRIPT_DIR}/"
   fi
 
   # Load Back-End Library Configurations
-  if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "spring-libraries.sh"; then
-    cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" .
+  if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/spring-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" "${SCRIPT_DIR}/"
   fi
 
   # Load Quarkus Library Configurations
-  if ! curl -sSfL "${QUARKUS_LIBRARY_CONFIG_LOCATION}" -o "quarkus-libraries.sh"; then
-    cp "${LOCAL_CONFIG_DIR}/quarkus-libraries.sh" .
+  if ! curl -sSfL "${QUARKUS_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/quarkus-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/quarkus-libraries.sh" "${SCRIPT_DIR}/"
   fi
 }
 
