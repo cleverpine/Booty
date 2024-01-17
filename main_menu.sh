@@ -73,7 +73,7 @@ show_main_menu() {
   echo "4. QA Automation service"
   echo ""
 
-  if [ -n "$verbose" ] && [ "$verbose" -eq 1 ]; then    
+  if [ -n "$verbose" ] && [ "$verbose" = true ]; then    
     echo "Verbose mode is active"
   fi
 
@@ -177,7 +177,7 @@ parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
         -v|--verbose)
-            verbose=1
+            verbose=true
             ;;
         --version)
               echo "${APP_VERSION}"
