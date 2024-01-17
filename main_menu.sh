@@ -1,10 +1,12 @@
 #!/bin/bash
 
-
+readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 readonly LOG_FILE="PB-Log-${current_timestamp}.log"
 readonly ERROR_LOG_FILE="PB-Error-Log-${current_timestamp}.log"
 readonly CURRENT_DIR=$(pwd)
+
+source "${SCRIPT_DIR}/config.sh"
 
 display_logo() {
 
@@ -130,22 +132,44 @@ load_configurations() {
   readonly BE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/spring-libraries.sh"
   readonly QUARKUS_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/quarkus-libraries.sh"
   
-  readonly LOCAL_CONFIG_DIR="./booty-configurations"
+  readonly LOCAL_CONFIG_DIR="${SCRIPT_DIR}/booty-configurations"
 
   # Load Front-End Library Configurations
-  if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "angular-libraries.sh"; then
-    cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" .
+  if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/angular-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" "${SCRIPT_DIR}/"
   fi
 
   # Load Back-End Library Configurations
-  if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "spring-libraries.sh"; then
-    cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" .
+  if ! curl -sSfL "${BE_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/spring-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/spring-libraries.sh" "${SCRIPT_DIR}/"
   fi
 
   # Load Quarkus Library Configurations
-  if ! curl -sSfL "${QUARKUS_LIBRARY_CONFIG_LOCATION}" -o "quarkus-libraries.sh"; then
-    cp "${LOCAL_CONFIG_DIR}/quarkus-libraries.sh" .
+  if ! curl -sSfL "${QUARKUS_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/quarkus-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/quarkus-libraries.sh" "${SCRIPT_DIR}/"
   fi
+}
+
+delete_old_logs() {
+  # Enable nullglob to handle cases where glob patterns do not match any files
+  shopt -s nullglob
+
+  # Create arrays of matching log files
+  local log_files=(PB-Log-*.log)
+  local error_files=(PB-Error-Log-*.log)
+
+  # Delete log files if array is not empty
+  if (( ${#log_files[@]} > 0 )); then
+    rm "${log_files[@]}" 2>/dev/null
+  fi
+
+  # Delete error log files if array is not empty
+  if (( ${#error_files[@]} > 0 )); then
+    rm "${error_files[@]}" 2>/dev/null
+  fi
+
+  # Revert nullglob to its original state
+  shopt -u nullglob
 }
 
 
@@ -155,20 +179,20 @@ parse_args() {
         -v|--verbose)
             verbose=1
             ;;
-        *)
-            # Handle other arguments if necessary
+        --version)
+              echo "${APP_VERSION}"
+              exit 0
             ;;
     esac
     shift
   done
 }
 
-# Delete old log files
-rm PB-Log-*.log
-rm PB-Error-Log-*.log
-
 # Parse command line arguments
 parse_args "$@"
+
+# Delete old log files
+delete_old_logs
 
 # Load library choice configurations
 load_configurations
@@ -176,18 +200,17 @@ load_configurations
 export verbose
 
 # Link all the other files
-source ./config.sh
-source ./utils/logging.sh
-source ./utils/common.sh
-source ./utils/git_commands.sh
+source "${SCRIPT_DIR}/utils/logging.sh"
+source "${SCRIPT_DIR}/utils/common.sh"
+source "${SCRIPT_DIR}/utils/git_commands.sh"
 
-source ./angular-libraries.sh
-source ./spring-libraries.sh
-source ./quarkus-libraries.sh
+source "${SCRIPT_DIR}/angular-libraries.sh"
+source "${SCRIPT_DIR}/spring-libraries.sh"
+source "${SCRIPT_DIR}/quarkus-libraries.sh"
 
-source ./assertions.sh
-source ./frontend_setup.sh
-source ./backend_setup.sh
+source "${SCRIPT_DIR}/assertions.sh"
+source "${SCRIPT_DIR}/frontend_setup.sh"
+source "${SCRIPT_DIR}/backend_setup.sh"
 
 
 # Log all output to a log file, error log to error_log file and everything to terminal

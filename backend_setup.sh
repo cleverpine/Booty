@@ -5,7 +5,7 @@ setup_backend() {
   echo "1. Spring Boot"
   echo "2. Quarkus"
   echo ""
-  read -p "Enter the number of your choice (or type 'help' for more options): " choice
+  user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
   
     case "$choice" in
         1)

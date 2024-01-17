@@ -16,7 +16,7 @@ log_warning() {
 
 log_verbose() {
     if [ "$verbose" = 1 ]; then
-        log "[DEBUG] $1"
+        log "[VERBOSE] $1"
     fi
 }
 
