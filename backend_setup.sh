@@ -53,12 +53,11 @@ setup_quarkus() {
 
     # 5. Select all cp libraries you want to include and convert them to names with versions
     prompt_cp_libraries $PROJECT_TYPE selected_libraries
-    log_verbose "Libraries selected: ${selected_libraries}"
     read -a selected_libraries_names_and_versions <<< "$(library_numbers_to_names_and_versions "${selected_libraries}" $PROJECT_TYPE)"
-    log_verbose "Libraries that will be installed in the quarkus project: ${selected_libraries_names_and_versions[*]}"
+    log "Libraries selected: ${selected_libraries_names_and_versions[*]} \n"
 
     # 6. Prompt for including Open API generator plugin
-    prompt_boolean "Would you like to include Open API generator?" should_include_api
+    prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${QUARKUS_OPENAPI_PLUGIN}:${QUARKUS_OPENAPI_PLUGIN_VERSION}${NC}" should_include_api
    
 
     # All the variables are set, now we can start generating the project
@@ -121,13 +120,13 @@ add_maven_dependency() {
     local dependency_name=$(echo "$dependency_name_version" | cut -d ':' -f 1)
     local dependency_version=$(echo "$dependency_name_version" | cut -d ':' -f 2)
 
-    log_verbose "Adding dependency: $dependency_name:$dependency_version to pom.xml"
+    log_verbose "Adding dependency: ${dependency_name}:${dependency_version} to pom.xml"
 
     # Define the path to the pom.xml file
     local pom_file="${project_name}/pom.xml"
 
     # Define the dependency tag
-    local dependency_tag="    <dependency>\n        <groupId>com.cleverpine</groupId>\n        <artifactId>$dependency_name</artifactId>\n        <version>$dependency_version</version>\n    </dependency>"
+    local dependency_tag="    <dependency>\n        <groupId>com.cleverpine</groupId>\n        <artifactId>${dependency_name}</artifactId>\n        <version>${dependency_version}</version>\n    </dependency>"
 
     # Find the line number of the last </dependencies> tag
     local dependencies_end_line=$(grep -n '</dependencies>' "$pom_file" | tail -1 | cut -d: -f1)
@@ -152,8 +151,8 @@ add_open_api_generator() {
     # Define the plugin tag
     local plugin_tag="      <plugin>
         <groupId>org.openapitools</groupId>
-        <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>7.2.0</version>
+        <artifactId>${QUARKUS_OPENAPI_PLUGIN}</artifactId>
+        <version>${QUARKUS_OPENAPI_PLUGIN_VERSION}</version>
         <executions>
             <execution>
                 <goals>
@@ -214,9 +213,10 @@ setup_spring_boot() {
     # 5. Select all cp libraries you want to include
     prompt_cp_libraries "SPRING" LIBRARIES_CHOICE
     LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "BE")
+    log "Libraries selected: $LIBRARIES_NAMES \n"
 
     # 6. Prompt for including Open API generator plugin
-    prompt_boolean "Would you like to include Open API generator?" INCLUDE_API
+    prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${SPRING_OPENAPI_PLUGIN}:${SPRING_OPENAPI_PLUGIN_VERSION}${NC}" INCLUDE_API
     
     log_major_step "Using configuration:"
     log "Project name: $PROJECT_DIR"
