@@ -2,8 +2,10 @@
 
 readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
-readonly LOG_FILE="PB-Log-${current_timestamp}.log"
-readonly ERROR_LOG_FILE="PB-Error-Log-${current_timestamp}.log"
+
+mkdir -p ${SCRIPT_DIR}/logs
+readonly LOG_FILE="logs/PB-Log-${current_timestamp}.log"
+readonly ERROR_LOG_FILE="logs/PB-Error-Log-${current_timestamp}.log"
 readonly CURRENT_DIR=$(pwd)
 
 source "${SCRIPT_DIR}/config.sh"
@@ -73,7 +75,7 @@ show_main_menu() {
   echo "4. QA Automation service"
   echo ""
 
-  if [ -n "$verbose" ] && [ "$verbose" -eq 1 ]; then    
+  if [ -n "$verbose" ] && [ "$verbose" = true ]; then    
     echo "Verbose mode is active"
   fi
 
@@ -177,7 +179,7 @@ parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
         -v|--verbose)
-            verbose=1
+            verbose=true
             ;;
         --version)
               echo "${APP_VERSION}"
@@ -211,6 +213,7 @@ source "${SCRIPT_DIR}/quarkus-libraries.sh"
 source "${SCRIPT_DIR}/assertions.sh"
 source "${SCRIPT_DIR}/frontend_setup.sh"
 source "${SCRIPT_DIR}/backend_setup.sh"
+source "${SCRIPT_DIR}/qa_setup.sh"
 
 
 # Log all output to a log file, error log to error_log file and everything to terminal

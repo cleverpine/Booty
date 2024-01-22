@@ -17,7 +17,6 @@ prompt_project_name() {
     eval "$1=\$PROJECT_DIR"
 }
 
-
 prompt_git_remote() {
     log ""
 
@@ -196,7 +195,7 @@ library_numbers_to_names() {
         for lib in "${libraries[@]}"; do
             IFS=':' read -r key value <<< "$lib"
             if [ "$key" == "$number" ]; then
-                library_names+="$value, "
+                library_names+="$value,"
                 break
             fi
         done
@@ -260,7 +259,7 @@ user_prompt() {
 exec_cmd() {
     local COMMAND=$1
 
-    if [ "$verbose" = 1 ]; then
+    if [ "$verbose" = true ]; then
         log_verbose "Executing command: ${COMMAND}"
         eval "${COMMAND}"
     else
@@ -278,7 +277,7 @@ exec_cmd() {
 exec_cmd_tol() {
     local COMMAND=$1
 
-    if [ "$verbose" = 1 ]; then
+    if [ "$verbose" = true ]; then
         eval "$COMMAND"
     else
         eval "$COMMAND" > /dev/null
@@ -295,3 +294,4 @@ cleanup() {
         log_error "Failed to change to START_DIR. Cleanup aborted to prevent accidental data loss."
     fi
 }
+

@@ -1,0 +1,304 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: Template Service
+  description: This is a Template YAML For Microservices
+
+servers:
+  - url: http://localhost:8080
+    description: Local machine
+tags:
+  - name: "System"
+    description: All system methods
+  - name: "Templates"
+    description: All Template related methods
+
+paths:
+  /api/system/health:
+    get:
+      summary: This is a healthcheck method
+      description: This method returns a 200 response for healthcheck purposes
+      tags:
+        - "System"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/system/info:
+    get:
+      summary: This is a version method
+      description: This method returns the current application version
+      tags:
+        - "System"
+      responses:
+        "200":
+          $ref: "#/components/responses/SystemInfoResponse"
+  /api/templates:
+    get:
+      summary: This is a template get all method
+      description: This is a template description
+      tags:
+        - "Templates"
+      operationId: getTemplates
+      security:
+        - BearerAuth: [ ]
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      summary: This is a template post method
+      description: This is a template description
+      tags:
+        - "Templates"
+      operationId: createTemplate
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        description: This is a template request body description
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Template"
+      responses:
+        "201":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/templates/{id}:
+    get:
+      summary: This is a template get by id method
+      description: This is a template description
+      tags:
+        - "Templates"
+      operationId: getTemplate
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            description: This is the template parameter description
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      summary: This is a template put method
+      description: This is a template description
+      tags:
+        - "Templates"
+      operationId: updateTemplate
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            description: This is a template path parameter description
+      requestBody:
+        description: This is a template request body description
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateFull"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      summary: This is a template delete method
+      description: This is a template description
+      tags:
+        - "Templates"
+      operationId: deleteTemplate
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            description: This is a template parameter description
+      responses:
+        "204":
+          description: "OK"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    InfoHolder:
+      description: This is a object holding the version information
+      type: object
+      properties:
+        appBuildVersion:
+          type: string
+        appBuildTime:
+          type: string
+    ErrorResponse:
+      description: This is the response object in case of errors, compliant with RFC7807
+      type: object
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorData"
+    ErrorData:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    Template:
+      description: This is a Template object
+      type: object
+      properties:
+        foo:
+          type: string
+        bar:
+          type: string
+      discriminator:
+        propertyName: foo
+    TemplateFull:
+      description: This is a TemplateChild object that extends Template
+      allOf:
+        - $ref: "#/components/schemas/Template"
+      properties:
+        id:
+          type: integer
+    TemplateResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/TemplateFull"
+        error:
+          $ref: "#/components/schemas/ErrorData"
+    TemplateListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateFull"
+        error:
+          $ref: "#/components/schemas/ErrorData"
+  responses:
+    SystemInfoResponse:
+      description: "System Version Response"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/InfoHolder"
+    BadRequest:
+      description: "BAD REQUEST"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: "UNAUTHORIZED"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: "FORBIDDEN"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: "NOT FOUND"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerError:
+      description: "INTERNAL SERVER ERROR"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+security:
+  - BearerAuth: [ ]

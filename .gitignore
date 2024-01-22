@@ -2,5 +2,4 @@ angular-libraries.sh
 spring-libraries.sh
 quarkus-libraries.sh
 
-PB-Log**
-PB-Error-Log**
+logs/
