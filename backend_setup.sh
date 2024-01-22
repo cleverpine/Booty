@@ -133,20 +133,24 @@ configure_codegen_plugin_for_quarkus() {
     local project_name=$1
     
     log_major_step "Configuring Open API plugin use"
+    configure_local_api_repo "${project_name}"
+    
+    log_verbose "Adding codegen plugin to pom.xml..."
+    add_open_api_generator ${project_dir}
 
-    log_verbose "Creating local api git repository..."
+    log_verbose ""
+}
+
+configure_local_api_repo() {
+    local project_name=$1
+
+    log_verbose "Creating local api git repository for project ${project_name}..."
     exec_cmd "mkdir ${project_name}-api && cd ${project_name}-api && git init -b main"
+
     ## Curl api specification to current directory and name it according to the project name
     log_verbose "Curling api specification to current directory and naming it according to the project name..."
     exec_cmd "curl -sSfL \"https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/template-api.yml\" -o \"${project_name}-api.yml\""
     exec_cmd "cd .."
-
-    log_verbose "Adding codegen plugin to pom.xml..."
-    add_open_api_generator ${project_dir}
-
-    exec_cmd
-
-    log_verbose ""
 }
 
 
@@ -336,7 +340,12 @@ setup_spring_boot() {
     curl -f -L "$SPRING_INITIALIZR_JAR_URL" -o "$LOCAL_JAR_NAME"
     curl_status=$?
 
-    # 8. Initialize project generation if the jar file was downloaded successfully
+    # 8 Generate openapi local repo
+    if [ "$INCLUDE_API" = true ]; then
+        configure_local_api_repo $PROJECT_DIR
+    fi  
+
+    # 9. Initialize project generation if the jar file was downloaded successfully
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
@@ -349,14 +358,14 @@ setup_spring_boot() {
         exit 1
     fi
 
-    # 9. Delete the jar file if it executed successfully
+    # 10. Delete the jar file if it executed successfully
     if [ $java_status -eq 0 ]; then
         log "Successfully generated project '$PROJECT_DIR'."
     else
         log_error "'CP-Spring-Initializr' could not be executed!"
     fi
 
-    # 10. Delete the downloaded jar file
+    # 11. Delete the downloaded jar file
     rm -f cp-spring-initializr.jar
 }
 
