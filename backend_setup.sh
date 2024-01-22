@@ -75,7 +75,7 @@ setup_quarkus() {
     # mvnw quarkus:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${PROJECT_DIR}
     local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_dir} -DprojectVersion=0.0.1 -DjavaVersion=17" #TODO: java version
 
-    if [ "$verbose" = 1 ]; then
+    if [ "$verbose" = true ]; then
         command="$command -X"
     else
         command="$command -q"
@@ -240,6 +240,7 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
+        log "java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose"
         java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose
         java_status=$?
     else
