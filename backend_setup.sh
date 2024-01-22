@@ -71,7 +71,6 @@ setup_quarkus() {
     # Step 1: Generate the project
     log_major_step "Generating Quarkus project..."
     # mvnw quarkus:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${PROJECT_DIR}
-
     generate_quarkus_project $project_dir
 
     # Step 2: Add the libraries
@@ -337,6 +336,7 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
+        log "java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose"
         java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose
         java_status=$?
     else

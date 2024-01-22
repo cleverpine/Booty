@@ -159,7 +159,7 @@ install_additional_libraries() {
         for package in "${npm_packages[@]}"; do
             log_verbose "---------------------------------"
             log_verbose "Installing $package..."
-            if [ "$verbose" = 1 ]; then
+            if [ "$verbose" = true ]; then
                 exec 3>&1  # Save the current state of stdout
                 error_log=$(npm install "$package" --save 2>&1 >&3)
                 status=$?  # Capture the exit status
