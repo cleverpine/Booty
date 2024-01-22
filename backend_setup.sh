@@ -69,8 +69,6 @@ setup_quarkus() {
 
 
     # Step 1: Generate the project
-    log_major_step "Generating Quarkus project..."
-    # mvnw quarkus:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${PROJECT_DIR}
     generate_quarkus_project $project_dir
 
     # Step 2: Add the libraries
@@ -107,7 +105,7 @@ generate_quarkus_project() {
 
     # Step 2; Generate the project
     log_major_step "Generating Quarkus project..."
-    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_name} -DprojectVersion=0.0.1 -DjavaVersion=17" #TODO: java version
+    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_name} -DprojectVersion=0.0.1 -Dextensions=quarkus-resteasy-reactive-jackson -DjavaVersion=17" #TODO: java version
 
     if [ "$verbose" = 1 ]; then
         command="$command -X"
@@ -125,7 +123,7 @@ generate_quarkus_project() {
     fi
 
     # Step 3: Move generated project from homebrew dir to project_dir
-    log_verbose "Moving generated project from homebrew dir to project_dir..."
+    log_verbose "Moving generated project from ${SCRIPT_DIR} to ${CURRENT_DIR}..."
     exec_cmd "mv ${project_name} ${CURRENT_DIR}"
     cd $CURRENT_DIR
 }
@@ -186,7 +184,13 @@ add_open_api_generator() {
 
     local pom_file="${project_name}/pom.xml"
 
-    local swagger_jax_rs_dep_tag=" <dependency>
+    local swagger_jax_rs_dep_tag=" 
+      <dependency>
+          <groupId>org.hibernate.validator</groupId>
+          <artifactId>hibernate-validator</artifactId>
+          <version>8.0.1.Final</version>
+      </dependency>
+      <dependency>
           <groupId>io.swagger</groupId>
           <artifactId>swagger-jaxrs</artifactId>
           <version>1.6.12</version>
@@ -237,7 +241,7 @@ add_open_api_generator() {
             <activeByDefault>true</activeByDefault>
         </activation>
         <properties>
-            <api.specification.url>../\${artifactId}-api/\${artifactId}-api.yml</api.specification.url>
+            <api.specification.url>../\${project.artifactId}-api/\${project.artifactId}-api.yml</api.specification.url>
         </properties>
       </profile>"
 
