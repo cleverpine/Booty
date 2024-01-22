@@ -69,8 +69,6 @@ setup_quarkus() {
 
 
     # Step 1: Generate the project
-    log_major_step "Generating Quarkus project..."
-    # mvnw quarkus:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${PROJECT_DIR}
     generate_quarkus_project $project_dir
 
     # Step 2: Add the libraries
@@ -107,7 +105,7 @@ generate_quarkus_project() {
 
     # Step 2; Generate the project
     log_major_step "Generating Quarkus project..."
-    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_name} -DprojectVersion=0.0.1 -DjavaVersion=17" #TODO: java version
+    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_name} -DprojectVersion=0.0.1 -Dextensions=quarkus-resteasy-reactive-jackson -DjavaVersion=17" #TODO: java version
 
     if [ "$verbose" = 1 ]; then
         command="$command -X"
@@ -125,7 +123,7 @@ generate_quarkus_project() {
     fi
 
     # Step 3: Move generated project from homebrew dir to project_dir
-    log_verbose "Moving generated project from homebrew dir to project_dir..."
+    log_verbose "Moving generated project from ${SCRIPT_DIR} to ${CURRENT_DIR}..."
     exec_cmd "mv ${project_name} ${CURRENT_DIR}"
     cd $CURRENT_DIR
 }
@@ -135,20 +133,24 @@ configure_codegen_plugin_for_quarkus() {
     local project_name=$1
     
     log_major_step "Configuring Open API plugin use"
+    configure_local_api_repo "${project_name}"
+    
+    log_verbose "Adding codegen plugin to pom.xml..."
+    add_open_api_generator ${project_dir}
 
-    log_verbose "Creating local api git repository..."
+    log_verbose ""
+}
+
+configure_local_api_repo() {
+    local project_name=$1
+
+    log_verbose "Creating local api git repository for project ${project_name}..."
     exec_cmd "mkdir ${project_name}-api && cd ${project_name}-api && git init -b main"
+
     ## Curl api specification to current directory and name it according to the project name
     log_verbose "Curling api specification to current directory and naming it according to the project name..."
     exec_cmd "curl -sSfL \"https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/template-api.yml\" -o \"${project_name}-api.yml\""
     exec_cmd "cd .."
-
-    log_verbose "Adding codegen plugin to pom.xml..."
-    add_open_api_generator ${project_dir}
-
-    exec_cmd
-
-    log_verbose ""
 }
 
 
@@ -186,7 +188,13 @@ add_open_api_generator() {
 
     local pom_file="${project_name}/pom.xml"
 
-    local swagger_jax_rs_dep_tag=" <dependency>
+    local swagger_jax_rs_dep_tag=" 
+      <dependency>
+          <groupId>org.hibernate.validator</groupId>
+          <artifactId>hibernate-validator</artifactId>
+          <version>8.0.1.Final</version>
+      </dependency>
+      <dependency>
           <groupId>io.swagger</groupId>
           <artifactId>swagger-jaxrs</artifactId>
           <version>1.6.12</version>
@@ -237,7 +245,7 @@ add_open_api_generator() {
             <activeByDefault>true</activeByDefault>
         </activation>
         <properties>
-            <api.specification.url>../\${artifactId}-api/\${artifactId}-api.yml</api.specification.url>
+            <api.specification.url>../\${project.artifactId}-api/\${project.artifactId}-api.yml</api.specification.url>
         </properties>
       </profile>"
 
@@ -332,7 +340,12 @@ setup_spring_boot() {
     curl -f -L "$SPRING_INITIALIZR_JAR_URL" -o "$LOCAL_JAR_NAME"
     curl_status=$?
 
-    # 8. Initialize project generation if the jar file was downloaded successfully
+    # 8 Generate openapi local repo
+    if [ "$INCLUDE_API" = true ]; then
+        configure_local_api_repo $PROJECT_DIR
+    fi  
+
+    # 9. Initialize project generation if the jar file was downloaded successfully
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
@@ -345,14 +358,14 @@ setup_spring_boot() {
         exit 1
     fi
 
-    # 9. Delete the jar file if it executed successfully
+    # 10. Delete the jar file if it executed successfully
     if [ $java_status -eq 0 ]; then
         log "Successfully generated project '$PROJECT_DIR'."
     else
         log_error "'CP-Spring-Initializr' could not be executed!"
     fi
 
-    # 10. Delete the downloaded jar file
+    # 11. Delete the downloaded jar file
     rm -f cp-spring-initializr.jar
 }
 

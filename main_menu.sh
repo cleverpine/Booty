@@ -4,8 +4,8 @@ readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pw
 readonly current_timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 
 mkdir -p ${SCRIPT_DIR}/logs
-readonly LOG_FILE="logs/PB-Log-${current_timestamp}.log"
-readonly ERROR_LOG_FILE="logs/PB-Error-Log-${current_timestamp}.log"
+readonly LOG_FILE="${SCRIPT_DIR}/logs/PB-Log-${current_timestamp}.log"
+readonly ERROR_LOG_FILE="${SCRIPT_DIR}/logs/PB-Error-Log-${current_timestamp}.log"
 readonly CURRENT_DIR=$(pwd)
 
 source "${SCRIPT_DIR}/config.sh"
