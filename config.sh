@@ -1,5 +1,5 @@
 # App version and dependencies
-APP_VERSION="0.0.7"
+APP_VERSION="0.0.8"
 CP_INITIALIZR_VERSION="0.0.6"
 
 # Quarkus related
