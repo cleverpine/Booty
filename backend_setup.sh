@@ -59,7 +59,6 @@ setup_quarkus() {
     # 6. Prompt for including Open API generator plugin
     prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${QUARKUS_OPENAPI_PLUGIN}:${QUARKUS_OPENAPI_PLUGIN_VERSION}${NC}" should_include_api
    
-
     # All the variables are set, now we can start generating the project
     log_major_step "Using configuration:"
     log "Project name: $project_dir"
@@ -72,21 +71,8 @@ setup_quarkus() {
     # Step 1: Generate the project
     log_major_step "Generating Quarkus project..."
     # mvnw quarkus:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${PROJECT_DIR}
-    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_dir} -DprojectVersion=0.0.1 -DjavaVersion=17" #TODO: java version
 
-    if [ "$verbose" = 1 ]; then
-        command="$command -X"
-    else
-        command="$command -q"
-    fi
-
-    eval $command
-    local command_status=$?
-
-    if [ $command_status -ne 0 ]; then
-        log_error "Project generation failed!"
-        return $command_status
-    fi
+    generate_quarkus_project $project_dir
 
     # Step 2: Add the libraries
     for library in "${selected_libraries_names_and_versions[@]}"; do
@@ -97,7 +83,7 @@ setup_quarkus() {
     # If the user prompted to include an API, add the openapi-generator-maven-plugin 7.2.0 to the pom.xml file with an input spec url, api package ${project.groupId}.api, modelPackage ${project.groupId}.model, 
     # and output directory ${project.build.directory}/generated-sources
     if [ "$should_include_api" = true ]; then
-        add_open_api_generator $project_dir
+        configure_codegen_plugin_for_quarkus $project_dir
     fi
 
     log "Successfully generated project '$project_dir'."
@@ -113,6 +99,59 @@ setup_quarkus() {
 
     log_major_step "Quarkus project setup complete!"
 }
+
+generate_quarkus_project() {
+    local project_name=$1
+
+    # Step 1: Change working dir to scripts dir
+    cd $SCRIPT_DIR
+
+    # Step 2; Generate the project
+    log_major_step "Generating Quarkus project..."
+    local command="./mvnw io.quarkus.platform:quarkus-maven-plugin:3.6.4:create -DprojectGroupId=com.cleverpine -DprojectArtifactId=${project_name} -DprojectVersion=0.0.1 -DjavaVersion=17" #TODO: java version
+
+    if [ "$verbose" = 1 ]; then
+        command="$command -X"
+    else
+        command="$command -q"
+    fi
+    eval $command
+    
+    local command_status=$?
+
+    if [ $command_status -ne 0 ]; then
+        cd $CURRENT_DIR
+        log_error "Project generation failed!"
+        return $command_status
+    fi
+
+    # Step 3: Move generated project from homebrew dir to project_dir
+    log_verbose "Moving generated project from homebrew dir to project_dir..."
+    exec_cmd "mv ${project_name} ${CURRENT_DIR}"
+    cd $CURRENT_DIR
+}
+
+
+configure_codegen_plugin_for_quarkus() {
+    local project_name=$1
+    
+    log_major_step "Configuring Open API plugin use"
+
+    log_verbose "Creating local api git repository..."
+    exec_cmd "mkdir ${project_name}-api && cd ${project_name}-api && git init -b main"
+    ## Curl api specification to current directory and name it according to the project name
+    log_verbose "Curling api specification to current directory and naming it according to the project name..."
+    exec_cmd "curl -sSfL \"https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/template-api.yml\" -o \"${project_name}-api.yml\""
+    exec_cmd "cd .."
+
+    log_verbose "Adding codegen plugin to pom.xml..."
+    add_open_api_generator ${project_dir}
+
+    exec_cmd
+
+    log_verbose ""
+}
+
 
 add_maven_dependency() {
     local project_name=$1
@@ -148,6 +187,18 @@ add_open_api_generator() {
 
     local pom_file="${project_name}/pom.xml"
 
+    local swagger_jax_rs_dep_tag=" <dependency>
+          <groupId>io.swagger</groupId>
+          <artifactId>swagger-jaxrs</artifactId>
+          <version>1.6.12</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>javax.ws.rs</groupId>
+                  <artifactId>jsr311-api</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>"
+
     # Define the plugin tag
     local plugin_tag="      <plugin>
         <groupId>org.openapitools</groupId>
@@ -159,18 +210,54 @@ add_open_api_generator() {
                     <goal>generate</goal>
                 </goals>
                 <configuration>
-                    <inputSpec><!-- TODO: Insert your API specification URL here! --></inputSpec>
-                    <auth><!-- TODO: Insert your authorization token here! --></auth>
+                    <inputSpec>\${api.specification.url}</inputSpec>
+                    <auth>\${api.specification.authorization}</auth>
+                    <generatorName>jaxrs-resteasy-eap</generatorName>
                     <apiPackage>\${project.groupId}.api</apiPackage>
                     <modelPackage>\${project.groupId}.model</modelPackage>
                     <output>\${project.build.directory}/generated-sources/</output>
+                    <generateSupportingFiles>false</generateSupportingFiles>
+                    <generateModelTests>false</generateModelTests>
+                    <generateApiTests>false</generateApiTests>
+                    <configOptions>
+                         <sourceFolder>src/main/java</sourceFolder>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useTags>true</useTags>
+                                <dateLibrary>java8</dateLibrary>
+                                <useBeanValidation>true</useBeanValidation> 
+                    </configOptions>
                 </configuration>
             </execution>
         </executions>
       </plugin>"
 
+      # Define the local profile tag
+      local profile_tag="   <profile>
+        <id>local</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+            <api.specification.url>../\${artifactId}-api/\${artifactId}-api.yml</api.specification.url>
+        </properties>
+      </profile>"
+
+    local dependencies_end_line=$(grep -n '</dependencies>' "$pom_file" | tail -1 | cut -d: -f1)
+
+    if [[ -n "$dependencies_end_line" ]]; then
+        # Split the file at this line and insert the plugin tag
+        head -n $(($dependencies_end_line - 1)) "$pom_file" > temp
+        echo -e "$swagger_jax_rs_dep_tag" >> temp
+        tail -n +$dependencies_end_line "$pom_file" >> temp
+        mv temp "$pom_file"
+    else
+        log_verbose "No </dependencies> tag found in $pom_file. Plugin not added."
+    fi
+
+
     # Find the line number of the last </plugins> tag
     local plugins_end_line=$(grep -n '</plugins>' "$pom_file" | tail -1 | cut -d: -f1)
+
 
     if [[ -n "$plugins_end_line" ]]; then
         # Split the file at this line and insert the plugin tag
@@ -182,13 +269,23 @@ add_open_api_generator() {
         log_verbose "No </plugins> tag found in $pom_file. Plugin not added."
     fi
 
+    # Find the line number of the last </profiles> tag
+    local profiles_end_line=$(grep -n '</profiles>' "$pom_file" | tail -1 | cut -d: -f1)
+
+    if [[ -n "$profiles_end_line" ]]; then
+        # Split the file at this line and insert the plugin tag
+        head -n $(($profiles_end_line - 1)) "$pom_file" > temp1
+        echo -e "$profile_tag" >> temp1
+        tail -n +$profiles_end_line "$pom_file" >> temp1
+        mv temp1 "$pom_file"
+    else
+        log_verbose "No </profiles> tag found in $pom_file. Plugin not added."
+    fi
+
+    
+
     log_warning "Please make sure to add your API specification URL and authorization token to the pom.xml file!"
 }
-
-
-
-
-
 
 
 setup_spring_boot() {

@@ -17,7 +17,6 @@ prompt_project_name() {
     eval "$1=\$PROJECT_DIR"
 }
 
-
 prompt_git_remote() {
     log ""
 
@@ -295,3 +294,4 @@ cleanup() {
         log_error "Failed to change to START_DIR. Cleanup aborted to prevent accidental data loss."
     fi
 }
+
