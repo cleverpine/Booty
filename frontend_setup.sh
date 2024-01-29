@@ -1,4 +1,7 @@
 
+# Global variables
+FRAMEWORK=""
+
 setup_frontend() {
   echo ""
   echo "Please select the type of frontend you want to set up:"
@@ -10,10 +13,12 @@ setup_frontend() {
 
     case "$choice" in
         1)
-        setup_frontend_project "ANGULAR" $SSH_ANGULAR_SKELETON_CLONE_URL
+        FRAMEWORK="ANGULAR"
+        setup_frontend_project $SSH_ANGULAR_SKELETON_CLONE_URL
         ;;
         2)
-        setup_frontend_project "REACT" $SSH_REACT_SKELETON_CLONE_URL
+        FRAMEWORK="REACT"
+        setup_frontend_project $SSH_REACT_SKELETON_CLONE_URL
         ;;
         exit)
         log "Exiting Booty."
@@ -29,8 +34,7 @@ setup_frontend() {
 }
 
 setup_frontend_project() {
-    local FRAMEWORK=$1
-    local SKELETON_REPO=$2
+    local SKELETON_REPO=$1
     local START_DIR=$(pwd)
     local PROJECT_DIR
     local SSH_DIR
@@ -39,7 +43,7 @@ setup_frontend_project() {
 
     # 1. Check prerequisites for setting up a Project
     log_verbose "Verbose mode activated."
-    assert_prerequisites $FRAMEWORK
+    assert_prerequisites
     log_major_step "Prerequisites met! Begin project setup."
 
     # 2. Prompt for project name
@@ -90,11 +94,10 @@ setup_frontend_project() {
     fi
 
     # 8. Generate a new project from the skeleton
-    generate_new_project $FRAMEWORK $PROJECT_DIR $LIBRARIES_CHOICE
+    generate_new_project $PROJECT_DIR $LIBRARIES_CHOICE
 }
 
 assert_prerequisites() {
-    local FRAMEWORK=$1
     case "$FRAMEWORK" in 
         "ANGULAR")
         local angular_version_from_package=$(get_angular_version_from_package)
@@ -108,9 +111,8 @@ assert_prerequisites() {
 }
 
 generate_new_project() {
-    local FRAMEWORK=$1
-    local PROJECT_DIR=$2
-    local CP_LIBRARIES_TO_INSTALL=$3
+    local PROJECT_DIR=$1
+    local CP_LIBRARIES_TO_INSTALL=$2
 
     if [ -z "$PROJECT_DIR" ]; then
         log "Missing arguments for generate_new_project"
@@ -119,7 +121,7 @@ generate_new_project() {
 
     # 1. Rename skeleton project to the project name provided
     log_major_step "Renaming skeleton project to $PROJECT_DIR..."
-    rename_skeleton_files $FRAMEWORK $PROJECT_DIR
+    rename_skeleton_files $PROJECT_DIR
 
     # 2. Perform a clean install of the skeleton project
     log_major_step "Running npm ci..."
@@ -144,8 +146,7 @@ generate_new_project() {
 }
 
 rename_skeleton_files() {
-    local FRAMEWORK=$1
-    local PROJECT_DIR=$2
+    local PROJECT_DIR=$1
 
     case "$FRAMEWORK" in
         "ANGULAR")

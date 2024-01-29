@@ -25,7 +25,6 @@ readonly SPRING_OPENAPI_PLUGIN="swagger-codegen-maven-plugin"
 readonly SPRING_OPENAPI_PLUGIN_VERSION="3.0.51"
 
 # React related
-readonly BOOTY_CONFIGS_REPO_URL="https://github.com/cleverpine/pineboot-configurations.git"
 readonly RAW_REACT_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/react-skeleton/feature/base-structure/package.json"
 readonly SSH_REACT_SKELETON_CLONE_URL="git@github.com:cleverpine/react-skeleton.git"
 
