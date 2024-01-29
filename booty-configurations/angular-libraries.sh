@@ -1,21 +1,21 @@
 # Frontend libraries
 
-readonly CP_LHT_HEADER="cp-lht-header"
-readonly CP_LHT_SIDEBAR="cp-lht-sidebar"
-readonly CP_LHT_TILE="cp-lht-tile"
-readonly PRIME_NG="primeng"
-readonly SYNC_FUSION="syncfusion"
-readonly CP_OPENAPI_GEN_PLUGIN="cp-openapi-gen-plugin"
+readonly CP_LHT_HEADER="cp-lht-header:0.0.6"
+readonly CP_LHT_SIDEBAR="cp-lht-sidebar:0.0.8"
+readonly CP_LHT_TILE="cp-lht-tile:0.0.6"
+readonly PRIME_NG="primeng:17.1.0"
+readonly SYNC_FUSION="syncfusion:latest"
+readonly CP_OPENAPI_GEN_PLUGIN="cp-openapi-gen-plugin:0.0.6"
 
 
 
 readonly frontend_libraries=(
-    "1:${CP_LHT_HEADER}:0.0.6"
-    "2:${CP_LHT_SIDEBAR}:0.0.8"
-    "3:${CP_LHT_TILE}:0.0.6"
-    "4:${PRIME_NG}:17.1.0"
-    "5:${SYNC_FUSION}:latest" #???? 
-    "6:${CP_OPENAPI_GEN_PLUGIN}:0.0.6"
+    "1:${CP_LHT_HEADER}"
+    "2:${CP_LHT_SIDEBAR}"
+    "3:${CP_LHT_TILE}"
+    "4:${PRIME_NG}"
+    "5:${SYNC_FUSION}" #???? 
+    "6:${CP_OPENAPI_GEN_PLUGIN}"
 )
 
 # Frontend libraries descriptions
