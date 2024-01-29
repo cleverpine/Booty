@@ -31,7 +31,6 @@ setup_frontend() {
 setup_frontend_project() {
     local FRAMEWORK=$1
     local SKELETON_REPO=$2
-    log $SKELETON_REPO
     local START_DIR=$(pwd)
     local PROJECT_DIR
     local SSH_DIR
