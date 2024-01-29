@@ -10,10 +10,10 @@ setup_frontend() {
 
     case "$choice" in
         1)
-        setup_angular
+        setup_frontend_project "ANGULAR" $SSH_ANGULAR_SKELETON_CLONE_URL
         ;;
         2)
-        setup_react
+        setup_frontend_project "REACT" $SSH_REACT_SKELETON_CLONE_URL
         ;;
         exit)
         log "Exiting Booty."
@@ -28,23 +28,19 @@ setup_frontend() {
     esac
 }
 
-
-setup_angular() {
+setup_frontend_project() {
+    local FRAMEWORK=$1
+    local SKELETON_REPO=$2
+    log $SKELETON_REPO
     local START_DIR=$(pwd)
-    local SKELETON_REPO=$SSH_ANGULAR_SKELETON_CLONE_URL
     local PROJECT_DIR
     local SSH_DIR
     local GIT_REMOTE_URL
     local LIBRARIES_CHOICE
 
+    # 1. Check prerequisites for setting up a Project
     log_verbose "Verbose mode activated."
-
-    # 0. Fetch the Angular version used in the skeleton project 
-    local angular_version_from_package=$(get_angular_version_from_package)
-
-    # 1. Check prerequisites for setting up an Angular Project
-    log_major_step "Checking prerequisites..."
-    assert_angular_prerequisites $angular_version_from_package
+    assert_prerequisites $FRAMEWORK
     log_major_step "Prerequisites met! Begin project setup."
 
     # 2. Prompt for project name
@@ -55,18 +51,25 @@ setup_angular() {
 
     # 4. Configure Git remote repository (optional)
     prompt_git_remote GIT_REMOTE_URL
-    
-    # 5. Select all cp libraries you want to include
-    prompt_cp_libraries "FE" LIBRARIES_CHOICE
 
+    # 5. Select all cp libraries you want to include
+    case "$FRAMEWORK" in 
+        "ANGULAR")
+        prompt_cp_libraries "FE" LIBRARIES_CHOICE
+        ;;
+        "REACT")
+        # No CP libraries for React yet
+        ;;
+    esac
+    
     log_major_step "Using the following configuration:"
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
     log "Libraries to install: $LIBRARIES_CHOICE"
 
-    # 6. Clone the Angular skeleton repository
-    log_major_step "Cloning Angular skeleton repository..."
+    # 6. Clone the skeleton repository
+    log_major_step "Cloning ${FRAMEWORK} skeleton repository..."
     GIT_SSH_COMMAND="ssh -i ${SSH_DIR}" git clone $SKELETON_REPO $PROJECT_DIR
     cd $PROJECT_DIR
 
@@ -88,13 +91,27 @@ setup_angular() {
     fi
 
     # 8. Generate a new project from the skeleton
-    generate_new_project $PROJECT_DIR $LIBRARIES_CHOICE
+    generate_new_project $FRAMEWORK $PROJECT_DIR $LIBRARIES_CHOICE
 }
 
+assert_prerequisites() {
+    local FRAMEWORK=$1
+    case "$FRAMEWORK" in 
+        "ANGULAR")
+        local angular_version_from_package=$(get_angular_version_from_package)
+        assert_angular_prerequisites $angular_version_from_package
+        ;;
+        "REACT")
+        # Not validating the react version against anything, as it is not necessary?
+        assert_react_prerequisites
+        ;;
+    esac
+}
 
 generate_new_project() {
-    local PROJECT_DIR=$1
-    local CP_LIBRARIES_TO_INSTALL=$2
+    local FRAMEWORK=$1
+    local PROJECT_DIR=$2
+    local CP_LIBRARIES_TO_INSTALL=$3
 
     if [ -z "$PROJECT_DIR" ]; then
         log "Missing arguments for generate_new_project"
@@ -103,11 +120,7 @@ generate_new_project() {
 
     # 1. Rename skeleton project to the project name provided
     log_major_step "Renaming skeleton project to $PROJECT_DIR..."
-    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package.json
-    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package-lock.json
-    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" angular.json
-    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" docker-compose.yml
-    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" README.md
+    rename_skeleton_files $FRAMEWORK $PROJECT_DIR
 
     # 2. Perform a clean install of the skeleton project
     log_major_step "Running npm ci..."
@@ -131,6 +144,32 @@ generate_new_project() {
     fi
 }
 
+rename_skeleton_files() {
+    local FRAMEWORK=$1
+    local PROJECT_DIR=$2
+
+    case "$FRAMEWORK" in
+        "ANGULAR")
+        rename_angular_skeleton_files
+        ;;
+        "REACT")
+        rename_react_skeleton_files
+        ;;
+    esac
+}
+
+rename_angular_skeleton_files() {
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package.json
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" package-lock.json
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" angular.json
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" docker-compose.yml
+    sed -i "" "s/angular-skeleton/$PROJECT_DIR/g" README.md
+}
+
+rename_react_skeleton_files() {
+    sed -i "" "s/react-skeleton/$PROJECT_DIR/g" package.json
+    sed -i "" "s/react-skeleton/$PROJECT_DIR/g" package-lock.json
+}
 
 install_additional_libraries() {
     local LIBRARIES_CHOICE=$1
