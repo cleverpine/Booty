@@ -85,6 +85,12 @@ assert_java_version_greater_than_minimum_required() {
     log_verbose "Java version $java_version is compatible with the required to work with a ${project_type} project."
 }
 
+assert_react_prerequisites() {
+    assert_npm_is_present
+    assert_node_is_present
+    assert_git_is_present
+}
+
 assert_node_is_present() {
     log_verbose "Checking for Node..."
     if ! command -v node &> /dev/null
