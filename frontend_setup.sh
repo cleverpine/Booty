@@ -56,14 +56,7 @@ setup_frontend_project() {
     prompt_git_remote GIT_REMOTE_URL
 
     # 5. Select all cp libraries you want to include
-    case "$FRAMEWORK" in 
-        "ANGULAR")
-        prompt_cp_libraries "FE" LIBRARIES_CHOICE
-        ;;
-        "REACT")
-        # No CP libraries for React yet
-        ;;
-    esac
+    prompt_cp_libraries $FRAMEWORK LIBRARIES_CHOICE
     
     log_major_step "Using the following configuration:"
     log "Project name: $PROJECT_DIR"
@@ -181,10 +174,20 @@ install_additional_libraries() {
     local successful_packages=()
     local failed_packages=()
     local error_logs=()
+    local libraries=()
+
+    case "$FRAMEWORK" in
+        "ANGULAR")
+        libraries=("${frontend_libraries[@]}")
+        ;;
+        "REACT")
+        libraries=("${react_libraries[@]}")
+        ;;
+    esac
 
     for choice in "${LIBRARIES_CHOICE_ARRAY[@]}"
     do
-        for lib in "${frontend_libraries[@]}"; do
+        for lib in "${libraries[@]}"; do
             IFS=':' read -r key name version <<< "$lib"
             if [ "$key" == "$choice" ]; then
                 npm_packages+=("${name}@${version}")
