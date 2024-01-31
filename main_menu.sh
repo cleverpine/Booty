@@ -38,7 +38,7 @@ echo " ####       #####  ####       ##########       #####   #####     #####    
 echo " ####        ####  #####      ##### #####      #####   #####      ####     #### "
 echo " ################   ##############  ###############    #########  ############# "
 echo " ###############     ############     ###########       #######    ############ "
-echo "                                                                   ##      #### "
+echo "                                                                           #### "
 echo "                                                                  ############# "
 echo "                                                                   ###########  "
                                                                                   
@@ -133,12 +133,18 @@ load_configurations() {
   readonly FE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/angular-libraries.sh"
   readonly BE_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/spring-libraries.sh"
   readonly QUARKUS_LIBRARY_CONFIG_LOCATION="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/quarkus-libraries.sh"
+  readonly REACT_LIBRARY_CONFIG_LOCATIN="https://raw.githubusercontent.com/cleverpine/Booty/main/booty-configurations/react-libraries.sh"
   
   readonly LOCAL_CONFIG_DIR="${SCRIPT_DIR}/booty-configurations"
 
   # Load Front-End Library Configurations
   if ! curl -sSfL "${FE_LIBRARY_CONFIG_LOCATION}" -o "${SCRIPT_DIR}/angular-libraries.sh"; then
     cp "${LOCAL_CONFIG_DIR}/angular-libraries.sh" "${SCRIPT_DIR}/"
+  fi
+
+# Load React Library Configurations
+  if ! curl -sSfL "${REACT_LIBRARY_CONFIG_LOCATIN}" -o "${SCRIPT_DIR}/react-libraries.sh"; then
+    cp "${LOCAL_CONFIG_DIR}/react-libraries.sh" "${SCRIPT_DIR}/"
   fi
 
   # Load Back-End Library Configurations
@@ -209,6 +215,7 @@ source "${SCRIPT_DIR}/utils/git_commands.sh"
 source "${SCRIPT_DIR}/angular-libraries.sh"
 source "${SCRIPT_DIR}/spring-libraries.sh"
 source "${SCRIPT_DIR}/quarkus-libraries.sh"
+source "${SCRIPT_DIR}/react-libraries.sh"
 
 source "${SCRIPT_DIR}/assertions.sh"
 source "${SCRIPT_DIR}/frontend_setup.sh"
