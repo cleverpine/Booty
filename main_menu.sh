@@ -57,6 +57,7 @@ display_help_menu() {
     echo "Additional Commands:"
     echo "'exit' - Close Booty."
     echo "'version' - Display the current version of Booty."
+    echo "'booty --verbose' - Run booty like that to enable verbose mode."
     echo ""
    
     local choice
@@ -66,7 +67,6 @@ display_help_menu() {
 
 # Function to display the main menu
 show_main_menu() {
-  echo "Welcome to Booty!"
   echo ""
   echo "Please select the type of project you want to set up:"
   echo "1. Entire Project"
@@ -118,7 +118,7 @@ handle_user_choice() {
       show_main_menu
       ;;
     *)
-      echo "Oops! The number you entered doesn't match any of the available options. Please try again, or type 'help' for more information."
+      log_error "Oops! Your input is invalid. Please try again, or type 'help' for more information."
       show_main_menu
       ;;
   esac
@@ -221,6 +221,8 @@ exec > >(tee -a $LOG_FILE) 2> >(tee -a $ERROR_LOG_FILE >&2)
 
 # Display the logo
 display_logo
+
+echo "Welcome to Booty!"
 
 # Show the main menu
 show_main_menu

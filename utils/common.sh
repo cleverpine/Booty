@@ -2,7 +2,7 @@
 prompt_project_name() {
     while true; do
         log ""
-        user_prompt "Enter name for your $service_type project: " PROJECT_DIR
+        user_prompt "Enter name for your project: " PROJECT_DIR
 
         if [ -z "$PROJECT_DIR" ]; then
             log_error "You must select a project name."
@@ -20,7 +20,7 @@ prompt_project_name() {
 prompt_git_remote() {
     log ""
 
-    user_prompt "Paste a clone URL (leave blank if none): " GIT_REMOTE_URL
+    user_prompt "Enter Git repository URL as origin (leave blank for none): " GIT_REMOTE_URL
     eval "$1=\$GIT_REMOTE_URL"
 }
 
@@ -29,7 +29,7 @@ configure_ssh() {
     log ""
 
     while true; do
-        user_prompt "Enter a specific SSH directory (leave blank for default): " SSH_DIR
+        user_prompt "Provide SSH absolute private key path (blank for default):" SSH_DIR
 
         # If the input is blank, use the default directory and break the loop
         if [ -z "$SSH_DIR" ]; then
