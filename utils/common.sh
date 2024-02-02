@@ -2,8 +2,10 @@
 prompt_project_name() {
     while true; do
         log ""
-        user_prompt "Enter name for your project: " PROJECT_DIR
+        user_prompt "Provide name for your project: " PROJECT_DIR
 
+
+# validation needed here!
         if [ -z "$PROJECT_DIR" ]; then
             log_error "You must select a project name."
         elif [ -d "$PROJECT_DIR" ]; then
@@ -20,7 +22,7 @@ prompt_project_name() {
 prompt_git_remote() {
     log ""
 
-    user_prompt "Enter Git repository URL as origin (leave blank for none): " GIT_REMOTE_URL
+    user_prompt "Provide Git remote repository URL as origin (blank for none): " GIT_REMOTE_URL
     eval "$1=\$GIT_REMOTE_URL"
 }
 
@@ -29,7 +31,7 @@ configure_ssh() {
     log ""
 
     while true; do
-        user_prompt "Provide SSH absolute private key path (blank for default):" SSH_DIR
+        user_prompt "Provide SSH private key path (absolute, blank for default):" SSH_DIR
 
         # If the input is blank, use the default directory and break the loop
         if [ -z "$SSH_DIR" ]; then
@@ -102,7 +104,7 @@ prompt_cp_libraries() {
 
         if [[ "$choices" != "help" ]]; then
             log "Type 'help' to see more detailed description for each library.\n"
-            user_prompt "Enter a comma-separated list of libraries you wish to include (leave blank for all): " choices
+            user_prompt "Enter a comma-separated list of libraries you wish to include (blank for all): " choices
         fi
 
         # Check for 'help' input
@@ -191,11 +193,15 @@ library_numbers_to_names() {
         exit 1
     fi
 
-    for number in $library_numbers; do
-        for lib in "${libraries[@]}"; do
-            IFS=':' read -r key value <<< "$lib"
+    # itterate libs first, to ensure display consistency irregardless of user choice order
+    for lib in "${libraries[@]}"; do
+        IFS=':' read -r key value <<< "$lib"
+        for number in $library_numbers; do
             if [ "$key" == "$number" ]; then
-                library_names+="$value,"
+                if [ -n "$library_names" ]; then
+                    library_names+=", "
+                fi
+                library_names+="$value"
                 break
             fi
         done
@@ -238,6 +244,20 @@ library_numbers_to_names_and_versions() {
     echo "${library_names_and_versions[@]}"
 }
 
+logSelectedLibraries() {
+    local selected_libraries="$1"
+    local prefix="$2"
+    local LIBRARIES_NAMES
+
+    LIBRARIES_NAMES=$(library_numbers_to_names "$selected_libraries" "BE")
+
+    if [ -z "$LIBRARIES_NAMES" ]; then
+        log "${prefix}No additional libraries selected "
+    else
+        log "${prefix}Libraries selected: $LIBRARIES_NAMES "
+    fi
+}
+
 
 user_prompt() {
     local prompt_message=$1
@@ -251,6 +271,12 @@ user_prompt() {
 
     # Reset the text color
     printf "${NC}"
+
+    # Check if the user wants to exit the application
+    if [[ $_input == "exit" ]]; then
+        cleanup
+        exit 0
+    fi
 
     # Assign the input to the variable whose name was passed
     eval "$_varname=\$_input"

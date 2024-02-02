@@ -32,7 +32,7 @@ assert_angular_prerequisites() {
     #log versions of each of the above
     log "Node version: $(node --version)"
     log "NPM version: $(npm --version)"
-    log "Git version: $(git --version)"
+    log "Git version: $(git --version | grep -oE '[0-9]+(\.[0-9]+)*')"
 }
 
 assert_spring_boot_prerequisites() {
@@ -52,7 +52,7 @@ assert_spring_boot_prerequisites() {
     #log versions of each of the above
     log ""
     log "Java version: $(java --version)"
-    log "Git version: $(git --version)"
+    log "Git version: $(git --version | grep -oE '[0-9]+(\.[0-9]+)*')"
 
 }
 
@@ -68,7 +68,7 @@ assert_quarkus_prerequisites() {
 
     log ""
     log "Java version: $(java --version)"
-    log "Git version: $(git --version)"
+    log "Git version: $(git --version | grep -oE '[0-9]+(\.[0-9]+)*')"
 }
 
 assert_java_version_greater_than_minimum_required() {
@@ -126,7 +126,6 @@ assert_java_is_present() {
         exit 1
     fi
 }
-
 
 # Function to get major version from a version string
 get_major_version() {
