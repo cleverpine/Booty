@@ -71,6 +71,20 @@ assert_quarkus_prerequisites() {
     log "Git version: $(git --version)"
 }
 
+assert_qa_prerequisites() {
+    assert_node_is_present
+    assert_npm_is_present
+    assert_git_is_present
+
+    local node_version=$(node --version)
+    local node_major_version=$(get_major_version $node_version)
+    local required_major_node_version=$(get_qa_required_major_node_version)
+    #TODO: assert version is latest
+
+
+    
+}
+
 assert_java_version_greater_than_minimum_required() {
     local java_version=$1
     local minimum_java_version_required=$2
@@ -86,8 +100,8 @@ assert_java_version_greater_than_minimum_required() {
 }
 
 assert_react_prerequisites() {
-    assert_npm_is_present
     assert_node_is_present
+    assert_npm_is_present
     assert_git_is_present
 }
 
@@ -156,3 +170,7 @@ get_node_version_range() {
     done
     echo "Version not found"
 }
+
+# get_qa_required_major_node_version() {
+    
+# }

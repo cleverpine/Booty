@@ -104,6 +104,7 @@ handle_user_choice() {
       ;;
     4)
       log_verbose "You have selected \"QA Automation service\"."
+      setup_qa
       # Handle QA Automation service setup
       ;;
     help)

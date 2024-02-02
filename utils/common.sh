@@ -169,7 +169,7 @@ prompt_boolean() {
 
 
 comma_separated_choice_to_array() {
-    local IFS=',' 
+    local IFS=','
     read -r -a array <<< "$1"
     echo "${array[@]}"
 }
