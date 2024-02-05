@@ -29,7 +29,7 @@ readonly RAW_REACT_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/clev
 readonly SSH_REACT_SKELETON_CLONE_URL="git@github.com:cleverpine/react-skeleton.git"
 
 # QA related
-readonly QA_SKELETON_REPO="git@github.com:cleverpine/qa_setup_skeleton.git"
+readonly QA_SKELETON_REPO="git@github.com:cleverpine/qa_skeleton_setup.git"
 readonly RAW_QA_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/qa_skeleton_setup/main/package.json"
 
 # Color codes used for logging
