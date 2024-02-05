@@ -46,6 +46,16 @@ echo "                                                                   #######
 # 
 }
 
+display_welcome_message() {
+    welcome_message="${YELLOW}Welcome to Booty!${NC}"
+    
+    if [ -n "$verbose" ] && [ "$verbose" = true ]; then
+        welcome_message+=" Running in verbose mode."
+    fi
+
+    echo -e "$welcome_message"
+}
+
 # Function to display help menu
 display_help_menu() {
     echo "Help Options:"
@@ -74,10 +84,6 @@ show_main_menu() {
   echo "3. Front-end service"
   echo "4. QA Automation service"
   echo ""
-
-  if [ -n "$verbose" ] && [ "$verbose" = true ]; then    
-    echo "Verbose mode is active"
-  fi
 
   local choice
   user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
@@ -219,10 +225,9 @@ source "${SCRIPT_DIR}/qa_setup.sh"
 # Log all output to a log file, error log to error_log file and everything to terminal
 exec > >(tee -a $LOG_FILE) 2> >(tee -a $ERROR_LOG_FILE >&2)
 
-# Display the logo
+# Greet user
 display_logo
-
-echo "Welcome to Booty!"
+display_welcome_message
 
 # Show the main menu
 show_main_menu
