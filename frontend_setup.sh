@@ -216,9 +216,15 @@ install_additional_libraries() {
                 log_verbose "Successfully installed $package"
                 successful_packages+=("$package")
 
-                if [[ "$package" == *"${CP_OPENAPI_GEN_PLUGIN}"* ]]; then
+                log "real $package"
+                log "expected ${CP_OPENAPI_GEN_PLUGIN}"
+
+                if is_package_openapi_plugin $package; then
                     add_openapi_gen_npm_package
                 fi
+                # if [[ "$package" == "${CP_OPENAPI_GEN_PLUGIN}" ]]; then
+                #     add_openapi_gen_npm_package
+                # fi
             else
                 log_verbose "Failed to install $package"
                 failed_packages+=("$package")
@@ -248,6 +254,17 @@ install_additional_libraries() {
     fi
 }
 
+is_package_openapi_plugin() {
+    local package=$1
+    
+    log "Real package: $package <--> Expected pattern: ${CP_OPENAPI_GEN_PLUGIN}"
+    if [[ "$package" == *"${CP_OPENAPI_GEN_PLUGIN}"* ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 
 get_angular_version_from_package() {
     log_verbose "Fetching Angular version from package... $RAW_ANGULAR_SKELETON_PACKAGE_JSON"
@@ -258,7 +275,7 @@ get_angular_version_from_package() {
 
 add_openapi_gen_npm_package() {
     sed -i '' '/"scripts": {/a\'$'\n  INSERT_NEW_SCRIPT_HERE' package.json
-    sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "openapi-gen": "cp-openapi-gen",\\\n/' package.json
+    sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-angular",\\\n/' package.json
 
     log_warning "Remember to configure your spec location in the config.json!"
 }
