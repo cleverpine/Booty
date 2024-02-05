@@ -1,3 +1,9 @@
+PARSE_VERSION_REGEX='[0-9]+(\.[0-9]+)*'
+
+strip_version() {
+    local version=$1
+    echo $version | grep -oE $PARSE_VERSION_REGEX | head -n 1
+}
 
 prompt_project_name() {
     while true; do
@@ -193,7 +199,7 @@ library_numbers_to_names() {
         exit 1
     fi
 
-    # itterate libs first, to ensure display consistency irregardless of user choice order
+    # Iterate libs first to ensure display consistency irregardless of user choice order
     for lib in "${libraries[@]}"; do
         IFS=':' read -r key value <<< "$lib"
         for number in $library_numbers; do
@@ -244,17 +250,16 @@ library_numbers_to_names_and_versions() {
     echo "${library_names_and_versions[@]}"
 }
 
-logSelectedLibraries() {
+log_selected_libraries() {
     local selected_libraries="$1"
-    local prefix="$2"
-    local LIBRARIES_NAMES
+    local service_type="$2"
 
-    LIBRARIES_NAMES=$(library_numbers_to_names "$selected_libraries" "BE")
+    LIBRARIES_NAMES=$(library_numbers_to_names "$selected_libraries" "$service_type")
 
     if [ -z "$LIBRARIES_NAMES" ]; then
-        log "${prefix}No additional libraries selected "
+        log "No additional libraries selected "
     else
-        log "${prefix}Libraries selected: $LIBRARIES_NAMES "
+        log "Libraries selected: $LIBRARIES_NAMES "
     fi
 }
 

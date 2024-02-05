@@ -53,7 +53,7 @@ setup_quarkus() {
 
     # 5. Select all cp libraries you want to include and convert them to names with versions
     prompt_cp_libraries $PROJECT_TYPE selected_libraries
-    logSelectedLibraries "$selected_libraries"
+    log_selected_libraries "$selected_libraries" "BE"
     log ""
 
     # 6. Prompt for including Open API generator plugin
@@ -64,7 +64,7 @@ setup_quarkus() {
     log "Project name: $project_dir"
     log "SSH directory: $ssh_dir"
     log "Git remote URL: $git_remote_url"
-    logSelectedLibraries "$selected_libraries"
+    log_selected_libraries "$selected_libraries" "BE"
     log "Include api: $should_include_api"
 
 
@@ -312,7 +312,7 @@ setup_spring_boot() {
 
     # 5. Select all cp libraries you want to include
     prompt_cp_libraries "SPRING" LIBRARIES_CHOICE
-    logSelectedLibraries "$LIBRARIES_CHOICE"
+    log_selected_libraries "$LIBRARIES_CHOICE" "BE"
     log ""
 
     # 6. Prompt for including Open API generator plugin
@@ -322,7 +322,7 @@ setup_spring_boot() {
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    logSelectedLibraries "$LIBRARIES_CHOICE"
+    log_selected_libraries "$LIBRARIES_CHOICE" "BE"
     log "Include api: $INCLUDE_API"
 
     log_major_step "Generating Spring Boot project..."

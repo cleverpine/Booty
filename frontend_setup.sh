@@ -69,7 +69,7 @@ setup_frontend_project() {
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    log "Libraries to install: $LIBRARIES_CHOICE"
+    log_selected_libraries "$LIBRARIES_CHOICE" "FE"
 
     # 6. Clone the skeleton repository
     log_major_step "Cloning ${FRAMEWORK} skeleton repository..."
@@ -226,25 +226,27 @@ install_additional_libraries() {
         log "No additional libraries selected for install."
     fi
 
-
     # Display the report
-    log_major_step "Summary of additional library installations"
-    printf -- "\n- Successfully added libraries:\n"
-    for package in "${successful_packages[@]}"; do
-        printf "    - %b%s%b\n" "${GREEN}${BOLD}" "$package" "${NC}"
-    done
+    if [ ${#successful_packages[@]} -gt 0 ] || [ ${#failed_packages[@]} -gt 0 ]; then
+        log_major_step "Summary of additional library installations"
+    fi
 
-    printf -- "\n\n- Errors installing the following libraries:\n"
-    for i in "${!failed_packages[@]}"; do
-        printf "    - %b%s%b\n" "${RED}${BOLD}" "${failed_packages[$i]}" "${NC}"
-        printf '%s\n' "$(sed 's/^/\t/' <<< "${error_logs[$i]}")"
-    done
+    if [ ${#successful_packages[@]} -gt 0 ]; then
+        log_major_step "Summary of additional library installations"
+        printf -- "- Successfully added libraries:\n"
+        for package in "${successful_packages[@]}"; do
+            printf "    - %b%s%b\n" "${GREEN}${BOLD}" "$package" "${NC}"
+        done
+    fi
 
-    if [ "${#failed_packages[@]}" -gt 0 ]; then
-        log_warning "\nSome libraries failed to install. You may want to install them manually."
+    if [ ${#failed_packages[@]} -gt 0 ]; then
+        log "\n- Errors installing the following libraries. You may want to install them manually:\n"
+        for i in "${!failed_packages[@]}"; do
+            printf "    - %b%s%b\n" "${RED}${BOLD}" "${failed_packages[$i]}" "${NC}"
+            printf '%s\n' "$(sed 's/^/\t/' <<< "${error_logs[$i]}")"
+        done
     fi
 }
-
 
 get_angular_version_from_package() {
     log_verbose "Fetching Angular version from package... $RAW_ANGULAR_SKELETON_PACKAGE_JSON"
