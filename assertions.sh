@@ -71,6 +71,29 @@ assert_quarkus_prerequisites() {
     log "Git version: $(git --version)"
 }
 
+assert_qa_prerequisites() {
+    assert_node_is_present
+    assert_npm_is_present
+    assert_git_is_present
+
+    local node_version=$(node --version)
+    local node_major_version=$(get_major_version $node_version)
+    local required_major_node_version
+    get_qa_required_major_node_version required_major_node_version
+    required_major_node_version=$(get_major_version "$required_major_node_version")
+
+    log_verbose "Node version: $node_major_version"
+    log_verbose "Required Node version for QA: $required_major_node_version"
+
+    if [[ "$node_major_version" -lt "$required_major_node_version" ]]; then
+        log_error "Your local Node version $node_version is not compatible with the required to work with a QA project created using this tool."
+        log "Please install Node $required_major_node_version or higher and try again."
+        exit 1
+    else
+        log_verbose "Node version $node_major_version is compatible with the required to work with a QA project."
+    fi
+}
+
 assert_java_version_greater_than_minimum_required() {
     local java_version=$1
     local minimum_java_version_required=$2
@@ -86,8 +109,8 @@ assert_java_version_greater_than_minimum_required() {
 }
 
 assert_react_prerequisites() {
-    assert_npm_is_present
     assert_node_is_present
+    assert_npm_is_present
     assert_git_is_present
 }
 
@@ -155,4 +178,19 @@ get_node_version_range() {
         fi
     done
     echo "Version not found"
+}
+
+get_qa_required_major_node_version() {
+    log_verbose "Fetching required Node version for QA from skeleton package... $RAW_QA_SKELETON_PACKAGE_JSON"
+    local required_node_version=$(curl -s $RAW_QA_SKELETON_PACKAGE_JSON | awk -F'[:,]' '/"@types\/node"/ {gsub(/^[ \t"]+|[ \t",]+$/, "", $2); print $2}')
+
+    log_verbose "Required Node version for QA: $required_node_version"
+    eval "$1=\$required_node_version"
+}
+
+get_angular_version_from_package() {
+    log_verbose "Fetching Angular version from package... $RAW_ANGULAR_SKELETON_PACKAGE_JSON"
+    local angular_version_from_package=$(curl -s $RAW_ANGULAR_SKELETON_PACKAGE_JSON | awk -F'[:,]' '/"@angular\/core"/ {gsub(/^[ \t"]+|[ \t",]+$/, "", $2); print $2}')
+    log_verbose "Angular version from package: $angular_version_from_package"
+    echo $angular_version_from_package
 }
