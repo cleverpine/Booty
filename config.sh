@@ -30,7 +30,7 @@ readonly SSH_REACT_SKELETON_CLONE_URL="git@github.com:cleverpine/react-skeleton.
 
 # QA related
 readonly QA_SKELETON_REPO="git@github.com:cleverpine/qa_setup_skeleton.git"
-readonly RAW_QA_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/qa_setup_skeleton/main/package.json"
+readonly RAW_QA_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/qa_skeleton_setup/main/package.json"
 
 # Color codes used for logging
 export RED='\033[31m'

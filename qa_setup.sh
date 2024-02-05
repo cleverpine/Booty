@@ -11,7 +11,7 @@ setup_qa() {
     log_verbose "Verbose mode activated."
     
     #1 Check prerequisites for setting up a Project
-    # assert_qa_prerequisites
+    assert_qa_prerequisites
 
     #2 Prompt for project name
     prompt_project_name PROJECT_DIR
