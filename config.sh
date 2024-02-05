@@ -1,5 +1,5 @@
 # App version and dependencies
-APP_VERSION="0.0.10"
+APP_VERSION="0.0.11"
 CP_INITIALIZR_VERSION="0.0.9"
 
 # Quarkus related
@@ -27,6 +27,10 @@ readonly SPRING_OPENAPI_PLUGIN_VERSION="3.0.51"
 # React related
 readonly RAW_REACT_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/react-skeleton/feature/base-structure/package.json"
 readonly SSH_REACT_SKELETON_CLONE_URL="git@github.com:cleverpine/react-skeleton.git"
+
+# QA related
+readonly QA_SKELETON_REPO="git@github.com:cleverpine/qa_skeleton_setup.git"
+readonly RAW_QA_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/qa_skeleton_setup/main/package.json"
 
 # Color codes used for logging
 export RED='\033[31m'
