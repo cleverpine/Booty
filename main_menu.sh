@@ -46,6 +46,16 @@ echo "                                                                   #######
 # 
 }
 
+display_welcome_message() {
+    welcome_message="${YELLOW}Welcome to Booty!${NC}"
+    
+    if [ -n "$verbose" ] && [ "$verbose" = true ]; then
+        welcome_message+=" Running in verbose mode."
+    fi
+
+    echo -e "$welcome_message"
+}
+
 # Function to display help menu
 display_help_menu() {
     echo "Help Options:"
@@ -57,6 +67,7 @@ display_help_menu() {
     echo "Additional Commands:"
     echo "'exit' - Close Booty."
     echo "'version' - Display the current version of Booty."
+    echo "'booty --verbose' - Run booty like that to enable verbose mode."
     echo ""
    
     local choice
@@ -66,7 +77,6 @@ display_help_menu() {
 
 # Function to display the main menu
 show_main_menu() {
-  echo "Welcome to Booty!"
   echo ""
   echo "Please select the type of project you want to set up:"
   echo "1. Entire Project"
@@ -74,10 +84,6 @@ show_main_menu() {
   echo "3. Front-end service"
   echo "4. QA Automation service"
   echo ""
-
-  if [ -n "$verbose" ] && [ "$verbose" = true ]; then    
-    echo "Verbose mode is active"
-  fi
 
   local choice
   user_prompt "Enter the number of your choice (or type 'help' for more options): " choice
@@ -119,7 +125,7 @@ handle_user_choice() {
       show_main_menu
       ;;
     *)
-      echo "Oops! The number you entered doesn't match any of the available options. Please try again, or type 'help' for more information."
+      log_error "Oops! Your input is invalid. Please try again, or type 'help' for more information."
       show_main_menu
       ;;
   esac
@@ -164,8 +170,8 @@ delete_old_logs() {
   shopt -s nullglob
 
   # Create arrays of matching log files
-  local log_files=(PB-Log-*.log)
-  local error_files=(PB-Error-Log-*.log)
+  local log_files=(${SCRIPT_DIR}/logs/PB-Log-*.log)
+  local error_files=(${SCRIPT_DIR}/logs/PB-Error-Log-*.log)
 
   # Delete log files if array is not empty
   if (( ${#log_files[@]} > 0 )); then
@@ -227,8 +233,9 @@ source "${SCRIPT_DIR}/qa_setup.sh"
 # Log all output to a log file, error log to error_log file and everything to terminal
 exec > >(tee -a $LOG_FILE) 2> >(tee -a $ERROR_LOG_FILE >&2)
 
-# Display the logo
+# Greet user
 display_logo
+display_welcome_message
 
 # Show the main menu
 show_main_menu

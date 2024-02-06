@@ -13,7 +13,7 @@ readonly PRIME_NG="primeng"
 readonly PRIME_NG_VERSION="17.1.0"
 
 readonly CP_OPENAPI_GEN_PLUGIN="cp-openapi-gen-plugin"
-readonly CP_OPENAPI_GEN_PLUGIN_VERSION="0.0.6"
+readonly CP_OPENAPI_GEN_PLUGIN_VERSION="0.0.9"
 
 
 # NOTE - Consider using a @ instead of : to resolve all further problems when comparing in the code
