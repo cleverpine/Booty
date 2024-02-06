@@ -1,4 +1,3 @@
-
 assert_angular_prerequisites() {
     # Check if Node, npm and git are present
     assert_node_is_present
@@ -30,9 +29,9 @@ assert_angular_prerequisites() {
     fi
     
     #log versions of each of the above
-    log "Node version: $(node --version)"
-    log "NPM version: $(npm --version)"
-    log "Git version: $(git --version)"
+    log "Node version: $(strip_version "$(node --version)")"
+    log "NPM version: $(strip_version "$(npm --version)")"
+    log "Git version: $(strip_version "$(git --version)")"
 }
 
 assert_spring_boot_prerequisites() {
@@ -51,8 +50,8 @@ assert_spring_boot_prerequisites() {
 
     #log versions of each of the above
     log ""
-    log "Java version: $(java --version)"
-    log "Git version: $(git --version)"
+    log "Java version: $(strip_version "$(java --version)")"
+    log "Git version: $(strip_version "$(git --version)")"
 
 }
 
@@ -67,8 +66,8 @@ assert_quarkus_prerequisites() {
     assert_java_version_greater_than_minimum_required "$java_version" "$minimum_java_version_required" "$project_type"
 
     log ""
-    log "Java version: $(java --version)"
-    log "Git version: $(git --version)"
+    log "Java version: $(strip_version "$(java --version)")"
+    log "Git version: $(strip_version "$(git --version)")"
 }
 
 assert_qa_prerequisites() {
@@ -149,7 +148,6 @@ assert_java_is_present() {
         exit 1
     fi
 }
-
 
 # Function to get major version from a version string
 get_major_version() {

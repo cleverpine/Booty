@@ -53,8 +53,8 @@ setup_quarkus() {
 
     # 5. Select all cp libraries you want to include and convert them to names with versions
     prompt_cp_libraries $PROJECT_TYPE selected_libraries
-    read -a selected_libraries_names_and_versions <<< "$(library_numbers_to_names_and_versions "${selected_libraries}" $PROJECT_TYPE)"
-    log "Libraries selected: ${selected_libraries_names_and_versions[*]} \n"
+    log_selected_libraries "$selected_libraries" "BE"
+    log ""
 
     # 6. Prompt for including Open API generator plugin
     prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${QUARKUS_OPENAPI_PLUGIN}:${QUARKUS_OPENAPI_PLUGIN_VERSION}${NC}" should_include_api
@@ -64,7 +64,7 @@ setup_quarkus() {
     log "Project name: $project_dir"
     log "SSH directory: $ssh_dir"
     log "Git remote URL: $git_remote_url"
-    log "Libraries: ${selected_libraries_names_and_versions[*]}"
+    log_selected_libraries "$selected_libraries" "BE"
     log "Include api: $should_include_api"
 
 
@@ -127,7 +127,6 @@ generate_quarkus_project() {
     exec_cmd "mv ${project_name} ${CURRENT_DIR}"
     cd $CURRENT_DIR
 }
-
 
 configure_codegen_plugin_for_quarkus() {
     local project_name=$1
@@ -289,11 +288,8 @@ add_open_api_generator() {
         log_verbose "No </profiles> tag found in $pom_file. Plugin not added."
     fi
 
-    
-
     log_warning "Please make sure to add your API specification URL and authorization token to the pom.xml file!"
 }
-
 
 setup_spring_boot() {
     local START_DIR=$(pwd)
@@ -316,8 +312,8 @@ setup_spring_boot() {
 
     # 5. Select all cp libraries you want to include
     prompt_cp_libraries "SPRING" LIBRARIES_CHOICE
-    LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "BE")
-    log "Libraries selected: $LIBRARIES_NAMES \n"
+    log_selected_libraries "$LIBRARIES_CHOICE" "BE"
+    log ""
 
     # 6. Prompt for including Open API generator plugin
     prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${SPRING_OPENAPI_PLUGIN}:${SPRING_OPENAPI_PLUGIN_VERSION}${NC}" INCLUDE_API
@@ -326,7 +322,7 @@ setup_spring_boot() {
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    log "Libraries: $LIBRARIES_NAMES"
+    log_selected_libraries "$LIBRARIES_CHOICE" "BE"
     log "Include api: $INCLUDE_API"
 
     log_major_step "Generating Spring Boot project..."
