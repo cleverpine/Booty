@@ -65,9 +65,12 @@ prompt_cp_libraries() {
     local library_names=()
     local library_descs=() # Array for library descriptions
 
-    if [ "$1" == "FE" ]; then
+    if [ "$1" == "ANGULAR" ]; then
         libraries=("0:none" "${frontend_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${frontend_libs_descriptions[@]}")
+    elif [ "$1" == "REACT" ]; then
+        libraries=("0:none" "${react_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${react_libs_descriptions[@]}")
     elif [ "$1" == "SPRING" ]; then
         libraries=("0:none" "${backend_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${backend_libs_descriptions[@]}")
@@ -177,7 +180,7 @@ prompt_boolean() {
 
 
 comma_separated_choice_to_array() {
-    local IFS=',' 
+    local IFS=','
     read -r -a array <<< "$1"
     echo "${array[@]}"
 }

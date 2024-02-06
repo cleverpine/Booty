@@ -1,5 +1,6 @@
 angular-libraries.sh
 spring-libraries.sh
 quarkus-libraries.sh
+react-libraries.sh
 
 logs/
