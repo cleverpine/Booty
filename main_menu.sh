@@ -170,8 +170,8 @@ delete_old_logs() {
   shopt -s nullglob
 
   # Create arrays of matching log files
-  local log_files=(PB-Log-*.log)
-  local error_files=(PB-Error-Log-*.log)
+  local log_files=(${SCRIPT_DIR}/logs/PB-Log-*.log)
+  local error_files=(${SCRIPT_DIR}/logs/PB-Error-Log-*.log)
 
   # Delete log files if array is not empty
   if (( ${#log_files[@]} > 0 )); then
