@@ -1,19 +1,28 @@
 # Frontend libraries
 
-readonly CP_LHT_HEADER="cp-lht-header:0.0.6"
-readonly CP_LHT_SIDEBAR="cp-lht-sidebar:0.0.8"
-readonly CP_LHT_TILE="cp-lht-tile:0.0.6"
-readonly PRIME_NG="primeng:17.1.0"
-readonly CP_OPENAPI_GEN_PLUGIN="cp-openapi-gen-plugin:0.0.6"
+readonly CP_LHT_HEADER="cp-lht-header"
+readonly CP_LHT_HEADER_VERSION="0.0.6"
+
+readonly CP_LHT_SIDEBAR="cp-lht-sidebar"
+readonly CP_LHT_SIDEBAR_VERSION="0.0.8"
+
+readonly CP_LHT_TILE="cp-lht-tile"
+readonly CP_LHT_TILE_VERSION="0.0.6"
+
+readonly PRIME_NG="primeng"
+readonly PRIME_NG_VERSION="17.1.0"
+
+readonly CP_OPENAPI_GEN_PLUGIN="cp-openapi-gen-plugin"
+readonly CP_OPENAPI_GEN_PLUGIN_VERSION="0.0.6"
 
 
-
+# NOTE - Consider using a @ instead of : to resolve all further problems when comparing in the code
 readonly frontend_libraries=(
-    "1:${CP_LHT_HEADER}"
-    "2:${CP_LHT_SIDEBAR}"
-    "3:${CP_LHT_TILE}"
-    "4:${PRIME_NG}"
-    "5:${CP_OPENAPI_GEN_PLUGIN}"
+    "1:${CP_LHT_HEADER}:${CP_LHT_HEADER_VERSION}"
+    "2:${CP_LHT_SIDEBAR}:${CP_LHT_SIDEBAR_VERSION}"
+    "3:${CP_LHT_TILE}:${CP_LHT_TILE_VERSION}"
+    "4:${PRIME_NG}:${PRIME_NG_VERSION}"
+    "5:${CP_OPENAPI_GEN_PLUGIN}:${CP_OPENAPI_GEN_PLUGIN_VERSION}"
 )
 
 # Frontend libraries descriptions
