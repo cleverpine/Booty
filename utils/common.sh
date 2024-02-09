@@ -7,11 +7,9 @@ strip_version() {
 
 prompt_project_name() {
     while true; do
-        log ""
         user_prompt "Provide name for your project: " PROJECT_DIR
 
-
-# validation needed here!
+# Validation needed here!
         if [ -z "$PROJECT_DIR" ]; then
             log_error "You must select a project name."
         elif [ -d "$PROJECT_DIR" ]; then
@@ -71,12 +69,9 @@ prompt_cp_libraries() {
     elif [ "$1" == "REACT" ]; then
         libraries=("0:none" "${react_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${react_libs_descriptions[@]}")
-    elif [ "$1" == "SPRING" ]; then
+    elif [ "$1" == "BACKEND" ]; then
         libraries=("0:none" "${backend_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${backend_libs_descriptions[@]}")
-    elif [ "$1" == "QUARKUS" ]; then
-        libraries=("0:none" "${quarkus_libraries[@]}")
-        library_descs=("No additional libraries will be installed" "${quarkus_libraries_descriptions[@]}")
     else 
         log_error "Invalid service type: $1"
         exit 1

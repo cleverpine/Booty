@@ -42,17 +42,10 @@ assert_spring_boot_prerequisites() {
     local java_version=$(java -XshowSettings:properties -version 2>&1 | grep 'java.runtime.version' | awk '{print $3}' | cut -d '.' -f1 | cut -d '-' -f1 | cut -d '+' -f1)    
     
     assert_java_version_greater_than_minimum_required "$java_version" "$minimum_java_version_required" "Spring Boot"    
-    # if [ ]; then
-    #     log_error "Your local Java version $java_version is not compatible with the required to work with a Spring Boot project created using this tool."
-    #     log "Please install Java $minimum_java_version_required or higher and try again."
-    #     exit 1
-    # fi
 
     #log versions of each of the above
-    log ""
     log "Java version: $(strip_version "$(java --version)")"
     log "Git version: $(strip_version "$(git --version)")"
-
 }
 
 assert_quarkus_prerequisites() {
@@ -65,7 +58,6 @@ assert_quarkus_prerequisites() {
 
     assert_java_version_greater_than_minimum_required "$java_version" "$minimum_java_version_required" "$project_type"
 
-    log ""
     log "Java version: $(strip_version "$(java --version)")"
     log "Git version: $(strip_version "$(git --version)")"
 }
