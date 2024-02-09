@@ -29,6 +29,7 @@ setup_backend() {
 
 setup_quarkus() {
     local MAIN_DIR=$(pwd)
+    local PROJECT_TYPE="QUARKUS"
     local project_dir
     local ssh_dir
     local git_remote_url
@@ -51,7 +52,7 @@ setup_quarkus() {
     prompt_git_remote git_remote_url
 
     # 5. Select all cp libraries you want to include and convert them to names with versions
-    prompt_cp_libraries "BACKEND" selected_libraries
+    prompt_cp_libraries $PROJECT_TYPE selected_libraries
     log_selected_libraries "$selected_libraries" "BE"
     log ""
 
@@ -122,11 +123,6 @@ generate_quarkus_project() {
 
     # Step 3: Move generated project from homebrew dir to project_dir
     log_verbose "Moving generated project from ${SCRIPT_DIR} to ${CURRENT_DIR}..."
-
-    absolute_project_path="$(realpath "$project_name")"
-    absolute_current_dir="$(realpath "$CURRENT_DIR")"
-
-    if [ "$absolute_project_path" != "$absolute_current_dir/$project_name" ]; then
     exec_cmd "mv ${project_name} ${CURRENT_DIR}"
     cd $CURRENT_DIR
 }
@@ -314,7 +310,7 @@ setup_spring_boot() {
     prompt_git_remote GIT_REMOTE_URL
 
     # 5. Select all cp libraries you want to include
-    prompt_cp_libraries "BACKEND" LIBRARIES_CHOICE
+    prompt_cp_libraries "SPRING" LIBRARIES_CHOICE
     log_selected_libraries "$LIBRARIES_CHOICE" "BE"
     log ""
 
@@ -330,7 +326,7 @@ setup_spring_boot() {
 
     log_major_step "Generating Spring Boot project..."
 
-    # 7. Download cp-spring-initializr jar file
+       # 7. Download cp-spring-initializr jar file
     log "Downloading 'CP-Spring-Initializr'..."
 
     # '-f' argument returns a non-zero exit code on HTTP error response

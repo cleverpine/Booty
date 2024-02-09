@@ -69,14 +69,16 @@ prompt_cp_libraries() {
     elif [ "$1" == "REACT" ]; then
         libraries=("0:none" "${react_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${react_libs_descriptions[@]}")
-    elif [ "$1" == "BACKEND" ]; then
+    elif [ "$1" == "SPRING" ]; then
         libraries=("0:none" "${backend_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${backend_libs_descriptions[@]}")
+    elif [ "$1" == "QUARKUS" ]; then
+        libraries=("0:none" "${quarkus_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${quarkus_libraries_descriptions[@]}")
     else 
         log_error "Invalid service type: $1"
         exit 1
     fi
-
 
     # Extract keys, values, and names
     for i in "${libraries[@]}"; do
