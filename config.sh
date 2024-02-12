@@ -21,8 +21,8 @@ readonly node_versions=("^18.13.0 || ^20.9.0" "^16.14.0 || ^18.10.0" "^16.14.0 |
 readonly SPRING_INITIALIZR_JAR_URL="https://github.com/cleverpine/cp-spring-initializr/releases/download/v${CP_INITIALIZR_VERSION}/cp-spring-initializr-${CP_INITIALIZR_VERSION}.jar"
 readonly LOCAL_JAR_NAME="cp-spring-initializr.jar"
 readonly RAW_SPRING_INITIALIZR_CONFIG="https://raw.githubusercontent.com/cleverpine/cp-spring-initializr/main/src/main/resources/application.yml"
-readonly SPRING_OPENAPI_PLUGIN="swagger-codegen-maven-plugin"
-readonly SPRING_OPENAPI_PLUGIN_VERSION="3.0.51"
+readonly SPRING_OPENAPI_PLUGIN="openapi-generator-maven-plugin"
+readonly SPRING_OPENAPI_PLUGIN_VERSION="7.2.0"
 
 # React related
 readonly RAW_REACT_SKELETON_PACKAGE_JSON="https://raw.githubusercontent.com/cleverpine/react-skeleton/feature/base-structure/package.json"
