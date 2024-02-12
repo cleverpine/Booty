@@ -1,6 +1,6 @@
 # App version and dependencies
 APP_VERSION="0.0.12"
-CP_INITIALIZR_VERSION="0.0.9"
+CP_INITIALIZR_VERSION="0.0.10"
 
 # Quarkus related
 readonly QUARKUS_VERSION="3.6.4"
