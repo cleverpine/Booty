@@ -216,15 +216,10 @@ install_additional_libraries() {
                 log_verbose "Successfully installed $package"
                 successful_packages+=("$package")
 
-                log "real $package"
-                log "expected ${CP_OPENAPI_GEN_PLUGIN}"
-
                 if is_package_openapi_plugin $package; then
                     add_openapi_gen_npm_package
                 fi
-                # if [[ "$package" == "${CP_OPENAPI_GEN_PLUGIN}" ]]; then
-                #     add_openapi_gen_npm_package
-                # fi
+
             else
                 log_verbose "Failed to install $package"
                 failed_packages+=("$package")
@@ -267,7 +262,6 @@ is_package_openapi_plugin() {
         return 1
     fi
 }
-
 
 get_angular_version_from_package() {
     log_verbose "Fetching Angular version from package... $RAW_ANGULAR_SKELETON_PACKAGE_JSON"

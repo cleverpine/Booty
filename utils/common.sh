@@ -7,11 +7,9 @@ strip_version() {
 
 prompt_project_name() {
     while true; do
-        log ""
         user_prompt "Provide name for your project: " PROJECT_DIR
 
-
-# validation needed here!
+# Validation needed here!
         if [ -z "$PROJECT_DIR" ]; then
             log_error "You must select a project name."
         elif [ -d "$PROJECT_DIR" ]; then
@@ -81,7 +79,6 @@ prompt_cp_libraries() {
         log_error "Invalid service type: $1"
         exit 1
     fi
-
 
     # Extract keys, values, and names
     for i in "${libraries[@]}"; do

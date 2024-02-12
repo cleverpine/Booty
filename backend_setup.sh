@@ -67,7 +67,6 @@ setup_quarkus() {
     log_selected_libraries "$selected_libraries" "BE"
     log "Include api: $should_include_api"
 
-
     # Step 1: Generate the project
     generate_quarkus_project $project_dir
 
@@ -327,13 +326,15 @@ setup_spring_boot() {
 
     log_major_step "Generating Spring Boot project..."
 
-    # 7. Download cp-spring-initializr jar file
+       # 7. Download cp-spring-initializr jar file
     log "Downloading 'CP-Spring-Initializr'..."
 
     # '-f' argument returns a non-zero exit code on HTTP error response
     # '-L' argument sets the link to download from
     # '-o' argument renames the downloaded file
-    curl -f -L "$SPRING_INITIALIZR_JAR_URL" -o "$LOCAL_JAR_NAME"
+    # '-s' argument means quiet mode. Don't show progress meter.
+    # '-S' argument makes curl show an error message if it fails.
+    curl -f -L -s -S "$SPRING_INITIALIZR_JAR_URL" -o "$LOCAL_JAR_NAME"
     curl_status=$?
 
     # 8 Generate openapi local repo
@@ -345,7 +346,6 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
-        log "java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose"
         java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose
         java_status=$?
     else
