@@ -272,7 +272,13 @@ get_angular_version_from_package() {
 
 add_openapi_gen_npm_package() {
     sed -i '' '/"scripts": {/a\'$'\n  INSERT_NEW_SCRIPT_HERE' package.json
-    sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-angular",\\\n/' package.json
-
-    log_warning "Remember to configure your spec location in the config.json!"
+     case "$FRAMEWORK" in 
+        "ANGULAR")
+        sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-angular",\\\n/' package.json
+        ;;
+        "REACT")
+        # Not validating the react version against anything, as it is not necessary?
+        sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-react",\\\n/' package.json
+        ;;
+    esac
 }
