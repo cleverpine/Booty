@@ -62,7 +62,7 @@ setup_frontend_project() {
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    log_selected_libraries "$LIBRARIES_CHOICE" "FE"
+    log_selected_libraries "$LIBRARIES_CHOICE" "$FRAMEWORK"
 
     # 6. Clone the skeleton repository
     log_major_step "Cloning ${FRAMEWORK} skeleton repository..."
@@ -277,7 +277,6 @@ add_openapi_gen_npm_package() {
         sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-angular",\\\n/' package.json
         ;;
         "REACT")
-        # Not validating the react version against anything, as it is not necessary?
         sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-react",\\\n/' package.json
         ;;
     esac
