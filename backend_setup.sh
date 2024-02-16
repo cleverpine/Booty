@@ -336,7 +336,7 @@ setup_spring_boot() {
     # '-S' argument makes curl show an error message if it fails.
     curl -f -L -s -S "$SPRING_INITIALIZR_JAR_URL" -o "$LOCAL_JAR_NAME"
     curl_status=$?
-
+    
     # 8 Generate openapi local repo
     if [ "$INCLUDE_API" = true ]; then
         configure_local_api_repo $PROJECT_DIR
@@ -346,7 +346,7 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
-        java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies=$LIBRARIES_NAMES --verbose=$verbose
+        java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies="${LIBRARIES_NAMES}" --verbose=$verbose
         java_status=$?
     else
         log_error "'CP-Spring-Initializr' could not be downloaded!"
@@ -361,8 +361,18 @@ setup_spring_boot() {
         log_error "'CP-Spring-Initializr' could not be executed!"
     fi
 
+    # 11. In the created project dir, create a local git repository with the name of the project, attach the remote repository if provided, and commit the changes
+    log_major_step "Setting up git repository..."
+    cd $PROJECT_DIR
+    exec_cmd "git init -b main && git add . && git commit -m \"Spring Boot setup: Initial commit\""
+    if [ -n "$GIT_REMOTE_URL" ]; then
+        exec_cmd "git remote add origin $GIT_REMOTE_URL"
+    fi
+
     # 11. Delete the downloaded jar file
     rm -f cp-spring-initializr.jar
+
+    log_major_step "Spring Boot project setup complete!"
 }
 
 
