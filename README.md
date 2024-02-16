@@ -1,4 +1,4 @@
-# Booty v0.0.13
+# Booty v0.0.14
 
 ## Description
 Booty is a command-line interface tool designed for Cleverpine employees, simplifying the process of setting up and configuring projects in alignment with the latest technological standards and company-specific libraries.
