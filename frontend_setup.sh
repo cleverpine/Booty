@@ -24,11 +24,9 @@ setup_frontend() {
         log "Exiting Booty."
         exit 0
         ;;
-        help)
-        log "Help is on the way!"
-        ;;
         *)
-        log "Invalid choice. Please try again."
+        log_error "Invalid choice. Please try again."
+        setup_frontend
         ;;
     esac
 }

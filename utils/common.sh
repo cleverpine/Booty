@@ -1,4 +1,17 @@
 PARSE_VERSION_REGEX='[0-9]+(\.[0-9]+)*'
+SPECIAL_CHARACTERS_REGEX='^[a-zA-Z0-9_-]+$'
+
+
+is_valid_input() {
+    local input=$1
+
+    if [[ $input =~ $SPECIAL_CHARACTERS_REGEX ]]; then
+        return 0
+    else
+        return 1
+    fi
+
+}
 
 strip_version() {
     local version=$1
@@ -9,8 +22,11 @@ prompt_project_name() {
     while true; do
         user_prompt "Provide name for your project: " PROJECT_DIR
 
+        
 # Validation needed here!
-        if [ -z "$PROJECT_DIR" ]; then
+        if ! is_valid_input "$PROJECT_DIR"; then
+            log_error "Invalid project name. Please use only letters, numbers, hyphens, and underscores."
+        elif [ -z "$PROJECT_DIR" ]; then
             log_error "You must select a project name."
         elif [ -d "$PROJECT_DIR" ]; then
             log_error "Directory $PROJECT_DIR already exists. Please choose a different name."
