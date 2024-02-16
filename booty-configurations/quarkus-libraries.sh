@@ -1,7 +1,11 @@
 # Quarkus libraries
+
+readonly CP_JPA_SPECIFICATION_RESOLVER="cp-jpa-specification-resolver"
+readonly CP_JPA_SPECIFICATION_RESOLVER_VERSION="1.0.0"
+
 readonly quarkus_libraries=(
     #CP related
-    "1:cp-jpa-specification-resolver:1.0.0"
+    "1:${CP_JPA_SPECIFICATION_RESOLVER}:${CP_JPA_SPECIFICATION_RESOLVER_VERSION}"
 )
 
 # Backend libraries descriptions

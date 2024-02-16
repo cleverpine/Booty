@@ -1,4 +1,4 @@
-# Backend libraries
+# Backend libraries - versions are configured in the cp-spring-initializr project
 readonly spring_libraries=(
     "1:cp-spring-error-util"
     "2:cp-virava-spring-helper"

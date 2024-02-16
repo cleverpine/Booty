@@ -28,12 +28,12 @@ setup_backend() {
 setup_quarkus() {
     local MAIN_DIR=$(pwd)
     local PROJECT_TYPE="QUARKUS"
-    local project_dir
-    local ssh_dir
-    local git_remote_url
-    local selected_libraries
-    local selected_libraries_names_and_versions
-    local should_include_api
+    local PROJECT_DIR
+    local SSH_DIR
+    local GIT_REMOTE_URL
+    local LIBRARIES_CHOICE
+    local SHOULD_INCLUDE_API
+    local LIBRARY_NAMES
     
     # 1. Check if Java and Git are installed
     log_major_step "Checking prerequisites..."
@@ -41,54 +41,53 @@ setup_quarkus() {
     log_major_step "Prerequisites met! Begin project setup."
     
     # 2. Prompt for project name
-    prompt_project_name project_dir
+    prompt_project_name PROJECT_DIR
 
     # 3. Configure SSH directory
-    configure_ssh ssh_dir
+    configure_ssh SSH_DIR
 
     # 4. Configure Git remote repository (optional)
-    prompt_git_remote git_remote_url
+    prompt_git_remote GIT_REMOTE_URL
 
     # 5. Select all cp libraries you want to include and convert them to names with versions
-    prompt_cp_libraries $PROJECT_TYPE selected_libraries
-    log_selected_libraries "$selected_libraries" "$PROJECT_TYPE"
-    log ""
+    prompt_cp_libraries $PROJECT_TYPE LIBRARIES_CHOICE
+    LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "$PROJECT_TYPE")
 
     # 6. Prompt for including Open API generator plugin
-    prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${QUARKUS_OPENAPI_PLUGIN}:${QUARKUS_OPENAPI_PLUGIN_VERSION}${NC}" should_include_api
+    prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${QUARKUS_OPENAPI_PLUGIN}:${QUARKUS_OPENAPI_PLUGIN_VERSION}${NC}" SHOULD_INCLUDE_API
    
     # All the variables are set, now we can start generating the project
     log_major_step "Using configuration:"
-    log "Project name: $project_dir"
-    log "SSH directory: $ssh_dir"
-    log "Git remote URL: $git_remote_url"
-    log_selected_libraries "$selected_libraries" "$PROJECT_TYPE"
-    log "Include api: $should_include_api"
+    log "Project name: $PROJECT_DIR"
+    log "SSH directory: $SSH_DIR"
+    log "Git remote URL: $GIT_REMOTE_URL"
+    log_selected_libraries "$LIBRARIES_NAMES"
+    log "Include api: $SHOULD_INCLUDE_API"
 
     # Step 1: Generate the project
-    generate_quarkus_project $project_dir
+    generate_quarkus_project $PROJECT_DIR
 
     # Step 2: Add the libraries
-    for library in "${selected_libraries_names_and_versions[@]}"; do
-        add_maven_dependency $project_dir $library
+    for library in "${LIBRARIES_NAMES[@]}"; do
+        add_maven_dependency $PROJECT_DIR $library
     done
 
     # Step 3: Add the Open API generator plugin 
     # If the user prompted to include an API, add the openapi-generator-maven-plugin 7.2.0 to the pom.xml file with an input spec url, api package ${project.groupId}.api, modelPackage ${project.groupId}.model, 
     # and output directory ${project.build.directory}/generated-sources
-    if [ "$should_include_api" = true ]; then
-        configure_codegen_plugin_for_quarkus $project_dir
+    if [ "$SHOULD_INCLUDE_API" = true ]; then
+        configure_codegen_plugin_for_quarkus $PROJECT_DIR
     fi
 
-    log "Successfully generated project '$project_dir'."
+    log "Successfully generated project '$PROJECT_DIR'."
 
 
     # Step 4: In the created project dir, create a local git repository with the name of the project, attach the remote repository if provided, and commit the changes
     log_major_step "Setting up git repository..."
-    cd $project_dir
+    cd $PROJECT_DIR
     exec_cmd "git init -b main && git add . && git commit -m \"Quarkus setup: Initial commit\""
-    if [ -n "$git_remote_url" ]; then
-        exec_cmd "git remote add origin $git_remote_url"
+    if [ -n "$GIT_REMOTE_URL" ]; then
+        exec_cmd "git remote add origin $GIT_REMOTE_URL"
     fi
 
     log_major_step "Quarkus project setup complete!"
@@ -120,8 +119,12 @@ generate_quarkus_project() {
     fi
 
     # Step 3: Move generated project from homebrew dir to project_dir
-    log_verbose "Moving generated project from ${SCRIPT_DIR} to ${CURRENT_DIR}..."
-    exec_cmd "mv ${project_name} ${CURRENT_DIR}"
+    # if script_dir and current_dir are not the same, move the generated project to the current directory
+    if [ "$SCRIPT_DIR" != "$CURRENT_DIR" ]; then
+        log_verbose "Moving generated project from ${SCRIPT_DIR} to ${CURRENT_DIR}..."
+        exec_cmd "mv ${project_name} ${CURRENT_DIR}"
+    fi
+
     cd $CURRENT_DIR
 }
 
@@ -132,7 +135,7 @@ configure_codegen_plugin_for_quarkus() {
     configure_local_api_repo "${project_name}"
     
     log_verbose "Adding codegen plugin to pom.xml..."
-    add_open_api_generator ${project_dir}
+    add_open_api_generator ${project_name}
 
     log_verbose ""
 }
@@ -254,7 +257,7 @@ add_open_api_generator() {
         tail -n +$dependencies_end_line "$pom_file" >> temp
         mv temp "$pom_file"
     else
-        log_verbose "No </dependencies> tag found in $pom_file. Plugin not added."
+        log_verbose "No </dependencies> tag found in $pom_file. Dependency not added."
     fi
 
 
@@ -282,7 +285,7 @@ add_open_api_generator() {
         tail -n +$profiles_end_line "$pom_file" >> temp1
         mv temp1 "$pom_file"
     else
-        log_verbose "No </profiles> tag found in $pom_file. Plugin not added."
+        log_verbose "No </profiles> tag found in $pom_file. Profile not added."
     fi
 
     log_warning "Please make sure to add your API specification URL and authorization token to the pom.xml file!"
@@ -291,6 +294,13 @@ add_open_api_generator() {
 setup_spring_boot() {
     local START_DIR=$(pwd)
     local PROJECT_TYPE="SPRING"
+    local PROJECT_DIR
+    local SSH_DIR
+    local GIT_REMOTE_URL
+    local LIBRARIES_CHOICE
+    local SHOULD_INCLUDE_API
+    local LIBRARY_NAMES
+
     local java_version_from_initializr_config=$(get_java_version_from_initializr_config)
 
     # 1. Check if Java and Git are installed
@@ -309,18 +319,18 @@ setup_spring_boot() {
 
     # 5. Select all cp libraries you want to include
     prompt_cp_libraries "$PROJECT_TYPE" LIBRARIES_CHOICE
-    log_selected_libraries "$LIBRARIES_CHOICE" "$PROJECT_TYPE"
-    log ""
+    LIBRARIES_NAMES=$(library_numbers_to_names "$LIBRARIES_CHOICE" "$PROJECT_TYPE")
+    
 
     # 6. Prompt for including Open API generator plugin
-    prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${SPRING_OPENAPI_PLUGIN}:${SPRING_OPENAPI_PLUGIN_VERSION}${NC}" INCLUDE_API
+    prompt_boolean "Would you like to include the following code generation plugin? ${UNDERLINE}${SPRING_OPENAPI_PLUGIN}:${SPRING_OPENAPI_PLUGIN_VERSION}${NC}" SHOULD_INCLUDE_API
     
     log_major_step "Using configuration:"
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    log_selected_libraries "$LIBRARIES_CHOICE" "$PROJECT_TYPE"
-    log "Include api: $INCLUDE_API"
+    log_selected_libraries "$LIBRARIES_NAMES"
+    log "Include api: $SHOULD_INCLUDE_API"
 
     log_major_step "Generating Spring Boot project..."
 
@@ -336,7 +346,7 @@ setup_spring_boot() {
     curl_status=$?
     
     # 8 Generate openapi local repo
-    if [ "$INCLUDE_API" = true ]; then
+    if [ "$SHOULD_INCLUDE_API" = true ]; then
         configure_local_api_repo $PROJECT_DIR
     fi  
 
@@ -344,7 +354,7 @@ setup_spring_boot() {
     if [ $curl_status -eq 0 ]; then
         log "Initializing project generation..."
         # Execute the jar file
-        java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$INCLUDE_API --dependencies="${LIBRARIES_NAMES}" --verbose=$verbose
+        java -jar $LOCAL_JAR_NAME --name=$PROJECT_DIR --includeApi=$SHOULD_INCLUDE_API --dependencies="${LIBRARIES_NAMES}" --verbose=$verbose
         java_status=$?
     else
         log_error "'CP-Spring-Initializr' could not be downloaded!"

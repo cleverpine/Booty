@@ -274,14 +274,10 @@ library_numbers_to_names_and_versions() {
 
 log_selected_libraries() {
     local selected_libraries="$1"
-    local project_type="$2"
-
-    LIBRARIES_NAMES=$(library_numbers_to_names "$selected_libraries" "$project_type")
-
-    if [ -z "$LIBRARIES_NAMES" ]; then
+    if [ -z "$selected_libraries" ]; then
         log "No additional libraries selected "
     else
-        log "Libraries selected: $LIBRARIES_NAMES "
+        log "Libraries selected: $selected_libraries "
     fi
 }
 
