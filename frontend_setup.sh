@@ -60,7 +60,7 @@ setup_frontend_project() {
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    log_selected_libraries "$LIBRARIES_CHOICE" "FE"
+    log_selected_libraries "$LIBRARIES_CHOICE" "$FRAMEWORK"
 
     # 6. Clone the skeleton repository
     log_major_step "Cloning ${FRAMEWORK} skeleton repository..."
@@ -270,7 +270,12 @@ get_angular_version_from_package() {
 
 add_openapi_gen_npm_package() {
     sed -i '' '/"scripts": {/a\'$'\n  INSERT_NEW_SCRIPT_HERE' package.json
-    sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-angular",\\\n/' package.json
-
-    log_warning "Remember to configure your spec location in the config.json!"
+     case "$FRAMEWORK" in 
+        "ANGULAR")
+        sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-angular",\\\n/' package.json
+        ;;
+        "REACT")
+        sed -i '' $'s/INSERT_NEW_SCRIPT_HERE/  "generate": "cp-openapi-gen-react",\\\n/' package.json
+        ;;
+    esac
 }

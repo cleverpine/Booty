@@ -1,5 +1,5 @@
 # Backend libraries
-readonly backend_libraries=(
+readonly spring_libraries=(
     "1:cp-spring-error-util"
     "2:cp-virava-spring-helper"
     "3:cp-jpa-specification-resolver"
@@ -7,7 +7,7 @@ readonly backend_libraries=(
 )
 
 # Backend libraries descriptions
-readonly backend_libs_descriptions=(
+readonly spring_libs_descriptions=(
     #1
     "CleverPine spring error util library provides global expcetion handling & reusable error response model\n
     Docs: \033[4mhttps://github.com/cleverpine/cp-spring-error-util\033[0m"

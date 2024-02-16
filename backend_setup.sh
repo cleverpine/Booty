@@ -51,7 +51,7 @@ setup_quarkus() {
 
     # 5. Select all cp libraries you want to include and convert them to names with versions
     prompt_cp_libraries $PROJECT_TYPE selected_libraries
-    log_selected_libraries "$selected_libraries" "BE"
+    log_selected_libraries "$selected_libraries" "$PROJECT_TYPE"
     log ""
 
     # 6. Prompt for including Open API generator plugin
@@ -62,7 +62,7 @@ setup_quarkus() {
     log "Project name: $project_dir"
     log "SSH directory: $ssh_dir"
     log "Git remote URL: $git_remote_url"
-    log_selected_libraries "$selected_libraries" "BE"
+    log_selected_libraries "$selected_libraries" "$PROJECT_TYPE"
     log "Include api: $should_include_api"
 
     # Step 1: Generate the project
@@ -290,7 +290,7 @@ add_open_api_generator() {
 
 setup_spring_boot() {
     local START_DIR=$(pwd)
-
+    local PROJECT_TYPE="SPRING"
     local java_version_from_initializr_config=$(get_java_version_from_initializr_config)
 
     # 1. Check if Java and Git are installed
@@ -308,8 +308,8 @@ setup_spring_boot() {
     prompt_git_remote GIT_REMOTE_URL
 
     # 5. Select all cp libraries you want to include
-    prompt_cp_libraries "SPRING" LIBRARIES_CHOICE
-    log_selected_libraries "$LIBRARIES_CHOICE" "BE"
+    prompt_cp_libraries "$PROJECT_TYPE" LIBRARIES_CHOICE
+    log_selected_libraries "$LIBRARIES_CHOICE" "$PROJECT_TYPE"
     log ""
 
     # 6. Prompt for including Open API generator plugin
@@ -319,7 +319,7 @@ setup_spring_boot() {
     log "Project name: $PROJECT_DIR"
     log "SSH directory: $SSH_DIR"
     log "Git remote URL: $GIT_REMOTE_URL"
-    log_selected_libraries "$LIBRARIES_CHOICE" "BE"
+    log_selected_libraries "$LIBRARIES_CHOICE" "$PROJECT_TYPE"
     log "Include api: $INCLUDE_API"
 
     log_major_step "Generating Spring Boot project..."
