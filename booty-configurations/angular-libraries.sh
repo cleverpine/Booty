@@ -17,7 +17,7 @@ readonly CP_OPENAPI_GEN_PLUGIN_VERSION="0.0.9"
 
 
 # NOTE - Consider using a @ instead of : to resolve all further problems when comparing in the code
-readonly frontend_libraries=(
+readonly angular_libraries=(
     "1:${CP_LHT_HEADER}:${CP_LHT_HEADER_VERSION}"
     "2:${CP_LHT_SIDEBAR}:${CP_LHT_SIDEBAR_VERSION}"
     "3:${CP_LHT_TILE}:${CP_LHT_TILE_VERSION}"
@@ -26,7 +26,7 @@ readonly frontend_libraries=(
 )
 
 # Frontend libraries descriptions
-readonly frontend_libs_descriptions=(
+readonly angular_libs_descriptions=(
     #1
     "The Sidebar Component provides a component that can be used to create a sidebar.\n
      Docs: \033[4mhttps://github.com/cleverpine/cp-angular-header\033[0m"
