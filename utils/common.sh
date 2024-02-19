@@ -335,12 +335,14 @@ exec_cmd_tol() {
 
 cleanup() {
     if cd "$START_DIR"; then
-        if [ -n "$PROJECT_DIR" ] && [ -d "$PROJECT_DIR" ]; then
-            log_warning "Cleaning up after errors...\n"
-            rm -rf -- "$PROJECT_DIR"
-        fi
+        log_warning "Cleaning up after errors...\n"
+        rm -rf "$PROJECT_DIR"
+        rm -rf "$PROJECT_DIR-api"
+        rm $LOCAL_JAR_NAME
     else
         log_error "Failed to change to START_DIR. Cleanup aborted to prevent accidental data loss."
     fi
+
+    exit 1
 }
 

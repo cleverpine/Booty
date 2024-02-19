@@ -229,6 +229,7 @@ source "${SCRIPT_DIR}/frontend_setup.sh"
 source "${SCRIPT_DIR}/backend_setup.sh"
 source "${SCRIPT_DIR}/qa_setup.sh"
 
+trap cleanup SIGINT
 
 # Log all output to a log file, error log to error_log file and everything to terminal
 exec > >(tee -a $LOG_FILE) 2> >(tee -a $ERROR_LOG_FILE >&2)
