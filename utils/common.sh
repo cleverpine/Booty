@@ -1,4 +1,17 @@
 PARSE_VERSION_REGEX='[0-9]+(\.[0-9]+)*'
+SPECIAL_CHARACTERS_REGEX='^[a-zA-Z0-9_-]+$'
+
+
+is_valid_input() {
+    local input=$1
+
+    if [[ $input =~ $SPECIAL_CHARACTERS_REGEX ]]; then
+        return 0
+    else
+        return 1
+    fi
+
+}
 
 strip_version() {
     local version=$1
@@ -9,8 +22,11 @@ prompt_project_name() {
     while true; do
         user_prompt "Provide name for your project: " PROJECT_DIR
 
+        
 # Validation needed here!
-        if [ -z "$PROJECT_DIR" ]; then
+        if ! is_valid_input "$PROJECT_DIR"; then
+            log_error "Invalid project name. Please use only letters, numbers, hyphens, and underscores."
+        elif [ -z "$PROJECT_DIR" ]; then
             log_error "You must select a project name."
         elif [ -d "$PROJECT_DIR" ]; then
             log_error "Directory $PROJECT_DIR already exists. Please choose a different name."
@@ -64,17 +80,17 @@ prompt_cp_libraries() {
     local library_descs=() # Array for library descriptions
 
     if [ "$1" == "ANGULAR" ]; then
-        libraries=("0:none" "${frontend_libraries[@]}")
-        library_descs=("No additional libraries will be installed" "${frontend_libs_descriptions[@]}")
+        libraries=("0:none" "${angular_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${angular_libs_descriptions[@]}")
     elif [ "$1" == "REACT" ]; then
         libraries=("0:none" "${react_libraries[@]}")
         library_descs=("No additional libraries will be installed" "${react_libs_descriptions[@]}")
     elif [ "$1" == "SPRING" ]; then
-        libraries=("0:none" "${backend_libraries[@]}")
-        library_descs=("No additional libraries will be installed" "${backend_libs_descriptions[@]}")
+        libraries=("0:none" "${spring_libraries[@]}")
+        library_descs=("No additional libraries will be installed" "${spring_libs_descriptions[@]}")
     elif [ "$1" == "QUARKUS" ]; then
         libraries=("0:none" "${quarkus_libraries[@]}")
-        library_descs=("No additional libraries will be installed" "${quarkus_libraries_descriptions[@]}")
+        library_descs=("No additional libraries will be installed" "${quarkus_libs_descriptions[@]}")
     else 
         log_error "Invalid service type: $1"
         exit 1
@@ -185,17 +201,21 @@ comma_separated_choice_to_array() {
 
 library_numbers_to_names() {
     local library_numbers=$1
-    local service_type=$2
+    local project_type=$2
     local library_names=""
     local IFS=','
     local libraries=()
 
-    if [ "$service_type" == "FE" ]; then
-        libraries=("${frontend_libraries[@]}")
-    elif [ "$service_type" == "BE" ]; then
-        libraries=("${backend_libraries[@]}")
+    if [ "$project_type" == "ANGULAR" ]; then
+        libraries=("${angular_libraries[@]}")
+    elif [ "$project_type" == "REACT" ]; then
+        libraries=("${react_libraries[@]}")
+    elif [ "$project_type" == "SPRING" ]; then
+        libraries=("${spring_libraries[@]}")
+    elif [ "$project_type" == "QUARKUS" ]; then
+        libraries=("${quarkus_libraries[@]}")
     else 
-        log_error "Invalid service type: $service_type"
+        log_error "Invalid service type: $project_type"
         exit 1
     fi
 
@@ -220,20 +240,22 @@ library_numbers_to_names() {
 
 library_numbers_to_names_and_versions() {
     local library_numbers=$1
-    local service_type=$2
+    local project_type=$2
     local library_names_and_versions=()
     local IFS=','
     local libraries=()
 
-    if [ "$service_type" == "FE" ]; then
+    if [ "$project_type" == "ANGULAR" ]; then
         libraries=("${frontend_libraries[@]}")
-    elif [ "$service_type" == "SPRING" ]; then
-        libraries=("${backend_libraries[@]}")
-    elif [ "$service_type" == "QUARKUS" ]; then
+    elif [ "$project_type" == "REACT" ]; then
+        libraries=("${react_libraries[@]}")
+    elif [ "$project_type" == "SPRING" ]; then
+        libraries=("${spring_libraries[@]}")
+    elif [ "$project_type" == "QUARKUS" ]; then
         libraries=("${quarkus_libraries[@]}")
     else 
-        log_error "Invalid service type: $service_type"
-        return 1
+        log_error "Invalid service type: $project_type"
+        exit 1
     fi
 
     for number in $library_numbers; do
@@ -252,14 +274,10 @@ library_numbers_to_names_and_versions() {
 
 log_selected_libraries() {
     local selected_libraries="$1"
-    local service_type="$2"
-
-    LIBRARIES_NAMES=$(library_numbers_to_names "$selected_libraries" "$service_type")
-
-    if [ -z "$LIBRARIES_NAMES" ]; then
+    if [ -z "$selected_libraries" ]; then
         log "No additional libraries selected "
     else
-        log "Libraries selected: $LIBRARIES_NAMES "
+        log "Libraries selected: $selected_libraries "
     fi
 }
 
