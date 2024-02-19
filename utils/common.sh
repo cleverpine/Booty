@@ -246,7 +246,7 @@ library_numbers_to_names_and_versions() {
     local libraries=()
 
     if [ "$project_type" == "ANGULAR" ]; then
-        libraries=("${frontend_libraries[@]}")
+        libraries=("${angular_libraries[@]}")
     elif [ "$project_type" == "REACT" ]; then
         libraries=("${react_libraries[@]}")
     elif [ "$project_type" == "SPRING" ]; then
