@@ -246,7 +246,7 @@ library_numbers_to_names_and_versions() {
     local libraries=()
 
     if [ "$project_type" == "ANGULAR" ]; then
-        libraries=("${frontend_libraries[@]}")
+        libraries=("${angular_libraries[@]}")
     elif [ "$project_type" == "REACT" ]; then
         libraries=("${react_libraries[@]}")
     elif [ "$project_type" == "SPRING" ]; then
@@ -335,12 +335,14 @@ exec_cmd_tol() {
 
 cleanup() {
     if cd "$START_DIR"; then
-        if [ -n "$PROJECT_DIR" ] && [ -d "$PROJECT_DIR" ]; then
-            log_warning "Cleaning up after errors...\n"
-            rm -rf -- "$PROJECT_DIR"
-        fi
+        log_warning "Cleaning up after errors...\n"
+        rm -rf "$PROJECT_DIR"
+        rm -rf "$PROJECT_DIR-api"
+        rm $LOCAL_JAR_NAME
     else
         log_error "Failed to change to START_DIR. Cleanup aborted to prevent accidental data loss."
     fi
+
+    exit 1
 }
 

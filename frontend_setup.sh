@@ -85,7 +85,7 @@ setup_frontend_project() {
     fi
 
     # 8. Generate a new project from the skeleton
-    generate_new_project $PROJECT_DIR $LIBRARIES_CHOICE
+    generate_new_project "$PROJECT_DIR" "$LIBRARIES_CHOICE"
 }
 
 assert_prerequisites() {
@@ -176,7 +176,7 @@ install_additional_libraries() {
 
     case "$FRAMEWORK" in
         "ANGULAR")
-        libraries=("${frontend_libraries[@]}")
+        libraries=("${angular_libraries[@]}")
         ;;
         "REACT")
         libraries=("${react_libraries[@]}")
@@ -253,7 +253,6 @@ install_additional_libraries() {
 is_package_openapi_plugin() {
     local package=$1
     
-    log "Real package: $package <--> Expected pattern: ${CP_OPENAPI_GEN_PLUGIN}"
     if [[ "$package" == *"${CP_OPENAPI_GEN_PLUGIN}"* ]]; then
         return 0
     else
