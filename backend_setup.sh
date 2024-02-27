@@ -67,10 +67,12 @@ setup_quarkus() {
     # Step 1: Generate the project
     generate_quarkus_project $PROJECT_DIR
 
-    # Step 2: Add the libraries
-    for library in "${LIBRARIES_NAMES[@]}"; do
-        add_maven_dependency $PROJECT_DIR $library
-    done
+    if ! [ -z "$LIBRARIES_NAMES" ]; then
+        # Step 2: Add the libraries
+        for library in "${LIBRARIES_NAMES[@]}"; do
+            add_maven_dependency $PROJECT_DIR $library
+        done
+    fi
 
     # Step 3: Add the Open API generator plugin 
     # If the user prompted to include an API, add the openapi-generator-maven-plugin 7.2.0 to the pom.xml file with an input spec url, api package ${project.groupId}.api, modelPackage ${project.groupId}.model, 
